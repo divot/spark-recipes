@@ -1,0 +1,77 @@
+# GLM-5.3-Flash / Unsloth UD-IQ3_XXS on ONE DGX Spark.
+#
+# Place this file at:
+#   local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml
+#
+# ONE-TIME IMAGE BUILD
+# --------------------
+# This recipe uses the SAME image as the Q2 recipe.  Build it once from the
+# root of eugr/spark-vllm-docker:
+#
+#   docker build \
+#     -f local-recipes/Dockerfile.glm53-llamacpp \
+#     -t glm53-llamacpp:cuda13.0 \
+#     local-recipes
+#
+# RUN
+# ---
+#   ./run-recipe.sh local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml --solo
+#
+# First launch downloads only the selected UD-IQ3_XXS GGUF (~120 GB, 4 shards)
+# through llama.cpp's -hf support.
+#
+# IMPORTANT: THIS QUANT IS EXTREMELY TIGHT ON A SINGLE SPARK.
+#   * A published single-Spark test loaded it at 64K context, but reported
+#     ~119/121 GiB used and only ~1 GiB free.
+#   * Therefore this recipe uses q8_0 KV, one slot, and caps llama-server's
+#     host-memory prompt cache at 256 MiB.
+#   * Native MTP is intentionally OFF by default here.  MTP creates additional
+#     runtime/context pressure, and the known 64K IQ3 load test did not use it.
+#     Get the basic recipe stable before spending the last scraps of headroom.
+#   * If 64K is marginal on your software revision, start at 32K:
+#       ./run-recipe.sh local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml \
+#         --solo --max-model-len 32768
+#   * If you want to experiment with MTP afterwards, add this final command
+#     line to the recipe (preferably while at 32K):
+#       --spec-type draft-mtp
+#   * Do NOT add --no-mmap on Spark UMA.
+#
+# Do NOT use --setup or --build-only for this local recipe; build the custom
+# image with the docker command above.
+#
+# GLM-5.3-Flash's chat template accepts request-level:
+#   "chat_template_kwargs": {"reasoning_effort": "low"|"high"|"max"}
+# Unspecified reasoning effort resolves to max.
+
+recipe_version: "1"
+name: GLM-5.3-Flash-UD-IQ3_XXS
+description: >-
+  Single-DGX-Spark GLM-5.3-Flash using Unsloth UD-IQ3_XXS GGUF.
+  Memory-conservative llama.cpp configuration; native MTP is off by default.
+
+container: glm53-llamacpp:cuda13.0
+solo_only: true
+
+env:
+  HF_HOME: /root/.cache/huggingface
+
+defaults:
+  host: 0.0.0.0
+  port: 8000
+  max_model_len: 65536
+  parallel: 1
+  cache_ram_mib: 256
+
+command: |
+  llama-server \
+    -hf unsloth/GLM-5.3-Flash-GGUF:UD-IQ3_XXS \
+    --host {host} \
+    --port {port} \
+    --n-gpu-layers 999 \
+    --ctx-size {max_model_len} \
+    --parallel {parallel} \
+    --cache-type-k q8_0 \
+    --cache-type-v q8_0 \
+    --flash-attn on \
+    --cache-ram {cache_ram_mib} \
+    --jinja

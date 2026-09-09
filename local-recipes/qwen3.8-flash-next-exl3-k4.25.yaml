@@ -1,0 +1,58 @@
+recipe_version: "1"
+
+name: Qwen3.8-Flash-Next-EXL3-K4.25
+
+description: >
+  Qwen3.8-Flash-Next quality-oriented EXL3 K4.25 routed experts
+  with BF16 PLE mmap, FP8 KV and native MTP on one DGX Spark.
+
+model: wrldsuksgo2mars/Qwen3.8-Flash-Next-EXL3-K4.25-v1
+
+solo_only: true
+
+container: qwen38-flash-next-exl3:20260907
+
+defaults:
+  port: 8000
+  host: 0.0.0.0
+  tensor_parallel: 1
+  gpu_memory_utilization: 0.70
+  max_model_len: 262144
+
+env:
+env:
+  OMP_NUM_THREADS: "8"
+
+  CUDA_CACHE_PATH: "/root/.cache/cuda"
+  TRITON_CACHE_DIR: "/root/.cache/triton"
+
+  QWEN38_B12X_VOCAB: "1"
+  QWEN38_B12X_NVFP4: "0"
+
+  VLLM_PLE_MMAP: "1"
+  VLLM_PLE_MMAP_WORKERS: "32"
+  VLLM_PLE_MMAP_CHUNK: "2048"
+  VLLM_PLE_MMAP_PREWARM: "0"
+  VLLM_PLE_MMAP_READAHEAD: "2048"
+  VLLM_PLE_MMAP_PINNED: "0"
+  VLLM_PLE_MMAP_SERIAL: "128"
+
+  VLLM_PLE_CPU_OFFLOAD: "0"
+  VLLM_PLE_OFFLOAD_READY_TIMEOUT: "1800"
+
+command: |
+  vllm serve wrldsuksgo2mars/Qwen3.8-Flash-Next-EXL3-K4.25-v1 \
+    --served-model-name qwen3.8-flash-next-exl3 \
+    --host {host} \
+    --port {port} \
+    --tensor-parallel-size {tensor_parallel} \
+    --distributed-executor-backend mp \
+    --gpu-memory-utilization {gpu_memory_utilization} \
+    --max-model-len {max_model_len} \
+    --max-num-seqs 16 \
+    --max-num-batched-tokens 2048 \
+    --kv-cache-dtype fp8 \
+    --enable-auto-tool-choice \
+    --tool-call-parser qwen3_coder \
+    --reasoning-parser qwen3 \
+    --speculative-config '{{"method":"mtp","num_speculative_tokens":2}}'
