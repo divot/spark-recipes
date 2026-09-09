@@ -1,16 +1,6 @@
 build_version: "1"
 image: qwen38-flash-next-a5b-autoround:20260908
 method: git
-repository: https://github.com/azampatti/Qwen3.8-Flash-Next-Int4-FAST.git
-ref: 986d5fd75ee400267b185ac65f2eb5ae94127716
-command:
-  - bash
-  - -lc
-  - >-
-    set -euo pipefail;
-    docker build
-    -t qwen38-flash-dgx:upstream
-    https://github.com/Saren-Arterius/qwen3.8-Flash-DGX-AutoRound.git#01c5914f322716b39fd71d5584ed800955582e65;
-    docker build --build-arg BASE=qwen38-flash-dgx:upstream -t "$IMAGE" .
-env:
-  IMAGE: "{image}"
+repository: https://github.com/Saren-Arterius/qwen3.8-Flash-DGX-AutoRound.git
+ref: 01c5914f322716b39fd71d5584ed800955582e65
+command: [docker, build, -t, "{image}", .]
