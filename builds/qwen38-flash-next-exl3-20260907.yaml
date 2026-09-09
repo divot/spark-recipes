@@ -1,0 +1,8 @@
+build_version: "1"
+image: qwen38-flash-next-exl3:20260907
+method: git
+repository: https://github.com/tpurtell/sm12x-exl3-qwen3.8-flash-next.git
+ref: c2c3c77e141fc6fad88dd9e47de53b71bd12ac6a
+command: [bash, build.sh]
+env:
+  IMAGE: "{image}"

@@ -3,15 +3,11 @@
 # Place this file at:
 #   local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml
 #
-# ONE-TIME IMAGE BUILD
-# --------------------
-# This recipe uses the SAME image as the Q2 recipe.  Build it once from the
-# root of eugr/spark-vllm-docker:
+# IMAGE SETUP
+# -----------
+# The shared llama.cpp image build is defined once in builds/. On first use:
 #
-#   docker build \
-#     -f local-recipes/Dockerfile.glm53-llamacpp \
-#     -t glm53-llamacpp:cuda13.0 \
-#     local-recipes
+#   ./run-recipe.sh local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml --solo --setup
 #
 # RUN
 # ---
@@ -36,9 +32,6 @@
 #       --spec-type draft-mtp
 #   * Do NOT add --no-mmap on Spark UMA.
 #
-# Do NOT use --setup or --build-only for this local recipe; build the custom
-# image with the docker command above.
-#
 # GLM-5.3-Flash's chat template accepts request-level:
 #   "chat_template_kwargs": {"reasoning_effort": "low"|"high"|"max"}
 # Unspecified reasoning effort resolves to max.
@@ -49,7 +42,7 @@ description: >-
   Single-DGX-Spark GLM-5.3-Flash using Unsloth UD-IQ3_XXS GGUF.
   Memory-conservative llama.cpp configuration; native MTP is off by default.
 
-container: glm53-llamacpp:cuda13.0
+build: glm53-llamacpp-cuda13.0
 solo_only: true
 
 env:

@@ -1,20 +1,18 @@
 # GLM-5.3-Flash / Unsloth UD-Q2_K_XL on ONE DGX Spark.
 #
 # Place this file at:
-#   local-recipes/glm-5.3-flash-ud-q2-k-xl.yaml
+#   local-recipes/glm-5.3-flash-ud-q2-k-xl-no-mtp.yaml
 #
-# ONE-TIME IMAGE BUILD
-# --------------------
-# From the root of eugr/spark-vllm-docker:
+# IMAGE SETUP
+# -----------
+# The shared llama.cpp image build is defined once in builds/. On first use:
 #
-#   docker build \
-#     -f local-recipes/Dockerfile.glm53-llamacpp \
-#     -t glm53-llamacpp:cuda13.0 \
-#     local-recipes
+#   ./run-recipe.sh local-recipes/glm-5.3-flash-ud-q2-k-xl-no-mtp.yaml \
+#     --solo --setup
 #
 # RUN
 # ---
-#   ./run-recipe.sh local-recipes/glm-5.3-flash-ud-q2-k-xl.yaml --solo
+#   ./run-recipe.sh local-recipes/glm-5.3-flash-ud-q2-k-xl-no-mtp.yaml --solo
 #
 # First launch downloads only the selected UD-Q2_K_XL GGUF (~109 GB, 4 shards)
 # through llama.cpp's -hf support.  spark-vllm-docker already mounts the host
@@ -22,11 +20,8 @@
 # container recreation.
 #
 # IMPORTANT:
-#   * Do NOT use --setup or --build-only for this local recipe.  Build the
-#     custom image with the docker command above.  The repo's current recipe
-#     build path delegates to build-and-copy.sh, which is vLLM-image oriented.
 #   * Do NOT add --no-mmap on the Spark's unified-memory system.
-#   * 256K + q8_0 KV + native MTP is a measured single-Spark configuration.
+#   * 256K + q8_0 KV without native MTP is a measured single-Spark configuration.
 #   * Do NOT try 1M context on one Spark.  Published tests have hard-wedged
 #     the machine under memory pressure.
 #   * For a lighter first smoke test:
@@ -38,12 +33,12 @@
 # Unspecified reasoning effort resolves to max.
 
 recipe_version: "1"
-name: GLM-5.3-Flash-UD-Q2_K_XL
+name: GLM-5.3-Flash-UD-Q2_K_XL-No-MTP
 description: >-
   Single-DGX-Spark GLM-5.3-Flash using Unsloth UD-Q2_K_XL GGUF,
-  llama.cpp glm5next MTP branch, q8 KV cache, and native MTP speculative decode.
+  llama.cpp glm5next branch and q8 KV cache, with native MTP disabled.
 
-container: glm53-llamacpp:cuda13.0
+build: glm53-llamacpp-cuda13.0
 solo_only: true
 
 env:

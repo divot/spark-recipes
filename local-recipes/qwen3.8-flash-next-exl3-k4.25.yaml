@@ -10,7 +10,7 @@ model: wrldsuksgo2mars/Qwen3.8-Flash-Next-EXL3-K4.25-v1
 
 solo_only: true
 
-container: qwen38-flash-next-exl3:20260907
+build: qwen38-flash-next-exl3-20260907
 
 defaults:
   port: 8000

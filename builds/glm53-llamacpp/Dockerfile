@@ -1,26 +1,8 @@
 # GLM-5.3-Flash llama.cpp image for a single DGX Spark / GB10.
 #
-# This intentionally uses CUDA 13.0.2 and builds for SM 12.1.  It also uses
-# eauchs' glm5next branch (llama.cpp PR #27752), because that branch has the
-# working native MTP/NextN draft graph used by the Q2 recipe.
-#
-# Build from the root of eugr/spark-vllm-docker:
-#
-#   docker build \
-#     -f local-recipes/Dockerfile.glm53-llamacpp \
-#     -t glm53-llamacpp:cuda13.0 \
-#     local-recipes
-#
-# To refresh the llama.cpp branch later:
-#
-#   docker build --pull --no-cache \
-#     -f local-recipes/Dockerfile.glm53-llamacpp \
-#     -t glm53-llamacpp:cuda13.0 \
-#     local-recipes
-#
-# The recipe runner's --setup/--build-only path is NOT used for this image:
-# spark-vllm-docker's build-and-copy.sh is currently oriented around its vLLM
-# Dockerfiles and does not provide a general custom-Dockerfile recipe hook.
+# This intentionally uses CUDA 13.0.2 and builds for SM 12.1. It also uses
+# eauchs' glm5next branch (llama.cpp PR #27752), which has the native MTP/NextN
+# draft graph used by the Q2 recipe.
 
 FROM nvidia/cuda:13.0.2-devel-ubuntu24.04
 

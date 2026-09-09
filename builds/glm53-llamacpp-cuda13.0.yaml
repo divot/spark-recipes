@@ -1,0 +1,5 @@
+build_version: "1"
+image: glm53-llamacpp:cuda13.0
+method: dockerfile
+context: builds/glm53-llamacpp
+dockerfile: Dockerfile
