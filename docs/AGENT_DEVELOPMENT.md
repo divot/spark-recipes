@@ -57,6 +57,8 @@ python -m pip install PyYAML
 
 - `run-recipe.sh` / `run-recipe.py`: supported recipe entry point and schema
   implementation
+- `builds/`: named, reusable container image build definitions and their local
+  Docker build contexts
 - `recipes/`: declarative model launch configurations
 - `launch-cluster.sh`: solo and multi-node container orchestration
 - `build-and-copy.sh`: image selection, building, and distribution
@@ -91,12 +93,14 @@ Nested recipes must be passed by path. The dummy `-n` addresses above are
 synthetic test inputs only; operational workflows use autodiscovery by default.
 
 Do not use `--setup`, `--build-only`, `--download-only`, `--force-*`, or
-`--discover` for development validation. Do not invoke `build-and-copy.sh` or
-`hf-download.sh` unless the task explicitly requires that operational action.
+`--discover` without `--dry-run` for development validation. A named build's
+plan can be validated without building by combining `--dry-run --build-only
+--force-build`. Do not invoke `build-and-copy.sh` or `hf-download.sh` unless the
+task explicitly requires that operational action.
 
 ## Creating or Changing Recipes
 
-A recipe currently requires:
+A recipe currently requires either a pre-existing/legacy container image:
 
 ```yaml
 recipe_version: "1"
@@ -105,6 +109,20 @@ container: vllm-node
 command: |
   vllm serve org/model --port {port} --host {host}
 ```
+
+or a named image build from `builds/<build-id>.yaml`:
+
+```yaml
+recipe_version: "1"
+name: Human-readable name
+build: build-id
+command: |
+  inference-server org/model --port {port} --host {host}
+```
+
+The build definition owns the resulting image name. Do not combine `build`
+with `container` or `build_args` in a recipe. See `builds/README.md` for the
+supported build methods.
 
 Common optional fields are `description`, `model`, `mods`, `build_args`,
 `defaults`, `env`, `cluster_only`, and `solo_only`.

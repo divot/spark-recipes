@@ -59,7 +59,8 @@ RECIPE YAML SCHEMA:
     name: str              # Required: Human-readable name
     recipe_version: str    # Required: Recipe schema version (e.g., '1'). Used by run-recipe.py
                            #           to check compatibility and available features.
-    container: str         # Required: Docker image tag
+    container: str         # Required unless build is set: existing/legacy Docker image tag
+    build: str             # Optional: build definition ID from builds/<id>.yaml
     command: str           # Required: vLLM serve command with {placeholders}
     description: str       # Optional: Brief description
     model: str             # Optional: HuggingFace model ID for --setup
@@ -102,6 +103,8 @@ except ImportError:
 
 SCRIPT_DIR = Path(__file__).parent.resolve()
 RECIPES_DIR = SCRIPT_DIR / "recipes"
+BUILDS_DIR = SCRIPT_DIR / "builds"
+BUILD_SOURCES_DIR = SCRIPT_DIR / ".build-sources"
 LAUNCH_SCRIPT = SCRIPT_DIR / "launch-cluster.sh"
 BUILD_SCRIPT = SCRIPT_DIR / "build-and-copy.sh"
 DOWNLOAD_SCRIPT = SCRIPT_DIR / "hf-download.sh"
@@ -110,6 +113,116 @@ ENV_FILE = None  # Will be set from CLI argument or default
 DISTRIBUTED_EXECUTOR_RE = re.compile(
     r"--distributed-executor-backend(?:=|\s+)\S+"
 )
+BUILD_ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")
+
+
+def _configuration_error(message: str) -> None:
+    print(f"Error: {message}")
+    raise SystemExit(1)
+
+
+def _require_string(mapping: dict[str, Any], field: str, label: str) -> str:
+    value = mapping.get(field)
+    if not isinstance(value, str) or not value.strip():
+        _configuration_error(f"{label} requires a non-empty '{field}' field")
+    return value
+
+
+def load_build_definition(build_id: str) -> dict[str, Any]:
+    """Load a named image build from builds/<build-id>.yaml."""
+    if not isinstance(build_id, str) or not BUILD_ID_RE.fullmatch(build_id):
+        _configuration_error(
+            "recipe build must be a name containing only letters, numbers, '.', '_' or '-'"
+        )
+
+    definitions: dict[str, dict[str, Any]] = {}
+    images: dict[str, str] = {}
+    if BUILDS_DIR.exists():
+        paths = sorted((*BUILDS_DIR.glob("*.yaml"), *BUILDS_DIR.glob("*.yml")))
+    else:
+        paths = []
+
+    for path in paths:
+        definition_id = path.stem
+        if definition_id in definitions:
+            _configuration_error(
+                f"duplicate build ID '{definition_id}' from both .yaml and .yml files"
+            )
+        with path.open() as f:
+            definition = yaml.safe_load(f)
+        if not isinstance(definition, dict):
+            _configuration_error(f"build definition '{definition_id}' must be a mapping")
+
+        version = str(definition.get("build_version", ""))
+        if version != "1":
+            _configuration_error(
+                f"build definition '{definition_id}' has unsupported build_version '{version}'"
+            )
+
+        image_name = _require_string(definition, "image", f"build '{definition_id}'")
+        previous_id = images.get(image_name)
+        if previous_id is not None:
+            _configuration_error(
+                f"builds '{previous_id}' and '{definition_id}' both produce image '{image_name}'"
+            )
+        images[image_name] = definition_id
+
+        method = _require_string(definition, "method", f"build '{definition_id}'")
+        if method not in {"dockerfile", "git", "pull", "vllm"}:
+            _configuration_error(
+                f"build '{definition_id}' has unsupported method '{method}'"
+            )
+
+        if method == "dockerfile":
+            _require_string(definition, "context", f"build '{definition_id}'")
+            _require_string(definition, "dockerfile", f"build '{definition_id}'")
+            args = definition.get("args", {})
+            if not isinstance(args, dict) or not all(
+                isinstance(key, str) and isinstance(value, (str, int, float, bool))
+                for key, value in args.items()
+            ):
+                _configuration_error(
+                    f"build '{definition_id}' args must map names to scalar values"
+                )
+        elif method == "git":
+            _require_string(definition, "repository", f"build '{definition_id}'")
+            _require_string(definition, "ref", f"build '{definition_id}'")
+            command = definition.get("command")
+            if (
+                not isinstance(command, list)
+                or not command
+                or not all(isinstance(part, str) and part for part in command)
+            ):
+                _configuration_error(
+                    f"build '{definition_id}' command must be a non-empty list of strings"
+                )
+            env = definition.get("env", {})
+            if not isinstance(env, dict) or not all(
+                isinstance(key, str) and isinstance(value, (str, int, float, bool))
+                for key, value in env.items()
+            ):
+                _configuration_error(
+                    f"build '{definition_id}' env must map names to scalar values"
+                )
+        elif method == "pull":
+            _require_string(definition, "source", f"build '{definition_id}'")
+        else:
+            args = definition.get("args", [])
+            if not isinstance(args, list) or not all(
+                isinstance(arg, str) for arg in args
+            ):
+                _configuration_error(f"build '{definition_id}' args must be a list")
+
+        definition = dict(definition)
+        definition["_id"] = definition_id
+        definition["_path"] = path
+        definitions[definition_id] = definition
+
+    if build_id not in definitions:
+        _configuration_error(
+            f"build definition '{build_id}' not found in {BUILDS_DIR}"
+        )
+    return definitions[build_id]
 
 
 def runtime_vllm_pr_reference(value: str) -> str:
@@ -184,7 +297,10 @@ def load_recipe(recipe_path: Path) -> dict[str, Any]:
         recipe_version (str, required): Schema version for compatibility checking.
             Used by run-recipe.py to determine which features are available.
             Current version: '1'. Bump when adding new recipe fields.
-        container (str, required): Docker image tag to use (e.g., 'vllm-node-mxfp4')
+        container (str, conditionally required): Docker image tag for the legacy
+            build path. Required unless build is set.
+        build (str, optional): Build definition ID from builds/<id>.yaml. A recipe
+            using this field omits container and build_args.
         command (str, required): vLLM serve command template with {placeholders}
         description (str, optional): Brief description shown in --list
         model (str, optional): HuggingFace model ID for --setup downloads
@@ -227,12 +343,27 @@ def load_recipe(recipe_path: Path) -> dict[str, Any]:
     with open(recipe_path) as f:
         recipe = yaml.safe_load(f)
 
+    if not isinstance(recipe, dict):
+        _configuration_error(f"recipe '{recipe_path}' must be a mapping")
+
     # Validate required fields
-    required = ["name", "recipe_version", "container", "command"]
+    required = ["name", "recipe_version", "command"]
     for field in required:
         if field not in recipe:
             print(f"Error: Recipe missing required field: {field}")
             sys.exit(1)
+
+    build_id = recipe.get("build")
+    if build_id is not None:
+        if "container" in recipe:
+            _configuration_error("recipe cannot specify both 'build' and 'container'")
+        if "build_args" in recipe:
+            _configuration_error("recipe cannot specify both 'build' and 'build_args'")
+        build_definition = load_build_definition(build_id)
+        recipe["container"] = build_definition["image"]
+        recipe["_build_definition"] = build_definition
+    elif "container" not in recipe:
+        _configuration_error("recipe requires either 'container' or 'build'")
 
     # Set defaults for optional fields
     recipe.setdefault("description", "")
@@ -286,6 +417,7 @@ def list_recipes() -> None:
             recipe_version = recipe.get("recipe_version", "1")
             desc = recipe.get("description", "")
             container = recipe.get("container", "vllm-node")
+            build_id = recipe.get("build")
             build_args = recipe.get("build_args", [])
             model = recipe.get("model", "")
             mods = recipe.get("mods", [])
@@ -303,6 +435,8 @@ def list_recipes() -> None:
             if solo_only:
                 print("    Solo only: Yes")
             print(f"    Container: {container}")
+            if build_id:
+                print(f"    Build: {build_id}")
             if build_args:
                 print(f"    Build args: {' '.join(build_args)}")
             if mods:
@@ -351,34 +485,201 @@ def check_image_exists(image: str, host: str | None = None) -> bool:
     return result.returncode == 0
 
 
-def build_image(
-    image: str, copy_to: list[str] | None = None, build_args: list[str] | None = None
+def _run_command(
+    command: list[str],
+    *,
+    cwd: Path | None = None,
+    env: dict[str, str] | None = None,
 ) -> bool:
-    """
-    Build the container image using build-and-copy.sh.
+    if cwd is not None:
+        print(f"Working directory: {cwd}")
+    print(f"Build command: {shlex.join(command)}")
+    return subprocess.run(command, cwd=cwd, env=env).returncode == 0
 
-    Delegates to the build-and-copy.sh script which handles multi-stage builds,
-    cache optimization, and distribution to worker nodes.
 
-    EXTENSIBILITY:
-    - To add new build options: Add them to build_args in the recipe's build_args field
-    - To support different Dockerfiles: Use build_args = ['-f', 'Dockerfile.custom']
-    - To add build-time secrets: Modify cmd array to include --secret flags
-    - To add progress callbacks: Capture subprocess output line-by-line
+def _resolve_build_context(definition: dict[str, Any]) -> tuple[Path, Path]:
+    context_value = Path(definition["context"])
+    dockerfile_value = Path(definition["dockerfile"])
+    if context_value.is_absolute() or dockerfile_value.is_absolute():
+        _configuration_error(
+            f"build '{definition['_id']}' Dockerfile paths must be repository-relative"
+        )
+    context = (SCRIPT_DIR / context_value).resolve()
+    dockerfile = (context / dockerfile_value).resolve()
+    if not context.is_relative_to(SCRIPT_DIR) or not dockerfile.is_relative_to(context):
+        _configuration_error(
+            f"build '{definition['_id']}' Dockerfile paths must stay inside the repository context"
+        )
+    if not context.is_dir():
+        _configuration_error(
+            f"build '{definition['_id']}' context does not exist: {context}"
+        )
+    if not dockerfile.is_file():
+        _configuration_error(
+            f"build '{definition['_id']}' Dockerfile does not exist: {dockerfile}"
+        )
+    return context, dockerfile
 
-    BUILD_ARGS EXAMPLES:
-        ['-f', 'Dockerfile.mxfp4']  - Use alternate Dockerfile
-        ['--no-cache']               - Force full rebuild
-        ['--build-arg', 'VAR=value'] - Pass build-time variables
 
-    Args:
-        image: Target image tag
-        copy_to: List of worker hostnames to copy image to after build
-        build_args: Extra arguments passed to build-and-copy.sh
+def build_definition_plan(definition: dict[str, Any]) -> list[str]:
+    """Describe the local preparation represented by a build definition."""
+    image = definition["image"]
+    method = definition["method"]
+    if method == "dockerfile":
+        context, dockerfile = _resolve_build_context(definition)
+        command = ["docker", "build", "-t", image, "-f", str(dockerfile)]
+        for key, value in definition.get("args", {}).items():
+            command.extend(["--build-arg", f"{key}={value}"])
+        command.append(str(context))
+        return ["Build method: dockerfile", f"Build command: {shlex.join(command)}"]
+    if method == "git":
+        source_dir = BUILD_SOURCES_DIR / definition["_id"]
+        env = " ".join(
+            f"{key}={str(value).replace('{image}', image)}"
+            for key, value in definition.get("env", {}).items()
+        )
+        command = shlex.join(definition["command"])
+        prefix = f"{env} " if env else ""
+        return [
+            "Build method: git",
+            f"Repository: {definition['repository']}",
+            f"Ref: {definition['ref']}",
+            f"Checkout: {source_dir}",
+            f"Build command: {prefix}{command}",
+        ]
+    if method == "pull":
+        return [
+            "Build method: pull",
+            f"Source image: {definition['source']}",
+            f"Target image: {image}",
+        ]
+    command = [str(BUILD_SCRIPT), "-t", image, *definition.get("args", [])]
+    return ["Build method: vllm", f"Build command: {shlex.join(command)}"]
 
-    Returns:
-        True if build (and copy) succeeded, False otherwise
-    """
+
+def _prepare_git_source(definition: dict[str, Any]) -> Path | None:
+    build_id = definition["_id"]
+    repository = definition["repository"]
+    ref = definition["ref"]
+    source_dir = BUILD_SOURCES_DIR / build_id
+    BUILD_SOURCES_DIR.mkdir(parents=True, exist_ok=True)
+
+    if source_dir.exists():
+        if not (source_dir / ".git").is_dir():
+            print(f"Error: Build source path is not a Git checkout: {source_dir}")
+            return None
+        origin = subprocess.run(
+            ["git", "-C", str(source_dir), "remote", "get-url", "origin"],
+            capture_output=True,
+            text=True,
+        )
+        if origin.returncode != 0 or origin.stdout.strip() != repository:
+            print(
+                f"Error: Cached build source '{build_id}' does not match repository {repository}"
+            )
+            return None
+        dirty = subprocess.run(
+            ["git", "-C", str(source_dir), "status", "--porcelain"],
+            capture_output=True,
+            text=True,
+        )
+        if dirty.returncode != 0 or dirty.stdout.strip():
+            print(
+                f"Error: Cached build source '{build_id}' has local changes; clean it before rebuilding"
+            )
+            return None
+    elif not _run_command(
+        ["git", "clone", "--no-checkout", repository, str(source_dir)]
+    ):
+        return None
+
+    if not _run_command(
+        ["git", "-C", str(source_dir), "fetch", "--tags", "origin", ref]
+    ):
+        return None
+    if not _run_command(
+        ["git", "-C", str(source_dir), "checkout", "--detach", "FETCH_HEAD"]
+    ):
+        return None
+    return source_dir
+
+
+def copy_existing_image(image: str, copy_to: list[str]) -> bool:
+    if not BUILD_SCRIPT.exists():
+        print(f"Error: Build script not found: {BUILD_SCRIPT}")
+        return False
+    cmd = [
+        str(BUILD_SCRIPT),
+        "-t",
+        image,
+        "--no-build",
+        "--copy-to",
+        ",".join(copy_to),
+        "--copy-parallel",
+    ]
+    print(f"Copying image '{image}' to: {', '.join(copy_to)}")
+    return subprocess.run(cmd).returncode == 0
+
+
+def build_image(
+    image: str,
+    copy_to: list[str] | None = None,
+    build_args: list[str] | None = None,
+    build_definition: dict[str, Any] | None = None,
+) -> bool:
+    """Prepare an image with a named build or the legacy vLLM builder."""
+    if build_definition is not None:
+        method = build_definition["method"]
+        if image != build_definition["image"]:
+            print(
+                f"Error: Build '{build_definition['_id']}' produces "
+                f"'{build_definition['image']}', not '{image}'"
+            )
+            return False
+
+        print(f"Preparing image '{image}' from build '{build_definition['_id']}'...")
+        if method == "dockerfile":
+            context, dockerfile = _resolve_build_context(build_definition)
+            cmd = ["docker", "build", "-t", image, "-f", str(dockerfile)]
+            for key, value in build_definition.get("args", {}).items():
+                cmd.extend(["--build-arg", f"{key}={value}"])
+            cmd.append(str(context))
+            prepared = _run_command(cmd)
+        elif method == "git":
+            source_dir = _prepare_git_source(build_definition)
+            if source_dir is None:
+                return False
+            env = os.environ.copy()
+            for key, value in build_definition.get("env", {}).items():
+                env[key] = str(value).replace("{image}", image)
+            print(
+                f"Warning: Running trusted build code from {build_definition['repository']} "
+                f"at {build_definition['ref']}"
+            )
+            prepared = _run_command(
+                list(build_definition["command"]), cwd=source_dir, env=env
+            )
+        elif method == "pull":
+            source = build_definition["source"]
+            prepared = _run_command(["docker", "pull", source])
+            if prepared and source != image:
+                prepared = _run_command(["docker", "tag", source, image])
+        else:
+            return build_image(
+                image,
+                copy_to=copy_to,
+                build_args=list(build_definition.get("args", [])),
+            )
+
+        if not prepared:
+            return False
+        if not check_image_exists(image):
+            print(f"Error: Build completed but did not produce image '{image}'")
+            return False
+        if copy_to:
+            return copy_existing_image(image, copy_to)
+        return True
+
     if not BUILD_SCRIPT.exists():
         print(f"Error: Build script not found: {BUILD_SCRIPT}")
         return False
@@ -1072,6 +1373,18 @@ Examples:
     container = args.container_override or recipe["container"]
     model = recipe.get("model")
     build_args = recipe.get("build_args", [])
+    build_definition = recipe.get("_build_definition")
+
+    if (
+        build_definition is not None
+        and args.container_override
+        and (args.setup or args.build_only or args.force_build)
+    ):
+        print(
+            f"Error: --container cannot override build '{recipe['build']}' "
+            "during an image preparation phase."
+        )
+        return 1
 
     # Parse nodes - check command line first, then .env file, then autodiscover
     nodes = parse_nodes(args.nodes) if not args.solo else []
@@ -1178,6 +1491,8 @@ Examples:
     if args.dry_run:
         print("=== Dry Run ===")
         print(f"Container: {container}")
+        if build_definition is not None:
+            print(f"Build: {recipe['build']}")
         if build_args:
             print(f"Build args: {' '.join(build_args)}")
         if model:
@@ -1217,6 +1532,9 @@ Examples:
             image_exists = check_image_exists(container)
             if args.force_build or not image_exists:
                 print(f"Would build container: {container}")
+                if build_definition is not None:
+                    for line in build_definition_plan(build_definition):
+                        print(f"  {line}")
                 if copy_targets:
                     print(f"  Would copy to: {', '.join(copy_targets)}")
             else:
@@ -1229,7 +1547,9 @@ Examples:
 
             if args.force_build or not image_exists:
                 print("=== Building Container ===")
-                if not build_image(container, copy_targets, build_args):
+                if not build_image(
+                    container, copy_targets, build_args, build_definition
+                ):
                     print("Error: Failed to build container")
                     return 1
                 print()
@@ -1243,8 +1563,12 @@ Examples:
                             missing_on.append(worker)
                     if missing_on:
                         print(f"Container missing on workers: {', '.join(missing_on)}")
-                        print("Building and copying...")
-                        if not build_image(container, missing_on, build_args):
+                        print("Copying prepared image...")
+                        if build_definition is not None:
+                            copied = copy_existing_image(container, missing_on)
+                        else:
+                            copied = build_image(container, missing_on, build_args)
+                        if not copied:
                             print("Error: Failed to build/copy container")
                             return 1
                 print()
@@ -1291,11 +1615,20 @@ Examples:
         print()
         print("Options:")
         print(f"  1. Use --setup to build and run")
-        print(f"  2. Build manually: ./build-and-copy.sh -t {container}")
+        if build_definition is None:
+            print(f"  2. Build manually: ./build-and-copy.sh -t {container}")
         print()
         response = input("Build now? [y/N] ").strip().lower()
         if response == "y":
-            if not build_image(container, copy_targets, build_args):
+            if build_definition is not None and args.container_override:
+                print(
+                    "Error: The overridden container is missing and cannot be prepared "
+                    "from the recipe's differently named build."
+                )
+                return 1
+            if not build_image(
+                container, copy_targets, build_args, build_definition
+            ):
                 print("Error: Failed to build image")
                 return 1
         else:
