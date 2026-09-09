@@ -2,6 +2,8 @@
 .env-*
 build-metadata.yaml
 .DS_STORE
+*~
+.venv/
 
 # Python bytecode and tool caches
 **/__pycache__/
