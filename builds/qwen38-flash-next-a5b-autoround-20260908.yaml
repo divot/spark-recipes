@@ -8,10 +8,9 @@ command:
   - -lc
   - >-
     set -euo pipefail;
-    rm -rf upstream;
-    git clone https://github.com/Saren-Arterius/qwen3.8-Flash-DGX-AutoRound.git upstream;
-    git -C upstream checkout 01c5914f322716b39fd71d5584ed800955582e65;
-    docker build -t qwen38-flash-dgx:upstream upstream;
+    docker build
+    -t qwen38-flash-dgx:upstream
+    https://github.com/Saren-Arterius/qwen3.8-Flash-DGX-AutoRound.git#01c5914f322716b39fd71d5584ed800955582e65;
     docker build --build-arg BASE=qwen38-flash-dgx:upstream -t "$IMAGE" .
 env:
   IMAGE: "{image}"
