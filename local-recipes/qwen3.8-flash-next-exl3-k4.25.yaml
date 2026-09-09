@@ -20,7 +20,6 @@ defaults:
   max_model_len: 262144
 
 env:
-env:
   OMP_NUM_THREADS: "8"
 
   CUDA_CACHE_PATH: "/root/.cache/cuda"
