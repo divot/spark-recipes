@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-10T21:19:16Z",
+  "updated_at": "2026-09-10T23:29:10Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -107,7 +107,7 @@
       "recipe_sha256": "ba73833b265e9afdb96983aa5df8746d4ec6fdbe0e7aa0a407a7731eb53e8007",
       "attempted": true,
       "ever_started_successfully": true,
-      "last_attempt_started_at": "2026-09-10T19:32:34Z",
+      "last_attempt_started_at": "2026-09-10T23:29:10Z",
       "last_successful_start_at": "2026-09-10T19:45:37Z",
       "last_stop_at": null,
       "attempts": [
@@ -134,6 +134,26 @@
               "text": "Trigger: GET /v1/models succeeded, followed by POST /v1/chat/completions for qwen3.8-flash-next-exl3 with user query \"Reply with exactly: pong\", max_tokens=16, and temperature=0. The POST returned HTTP API error code 500: EngineCore encountered an issue."
             }
           ],
+          "metrics": []
+        },
+        {
+          "id": "attempt-0002",
+          "recorded_at": "2026-09-10T23:29:10Z",
+          "started_at": "2026-09-10T23:29:10Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {},
+          "recipe_sha256": "ba73833b265e9afdb96983aa5df8746d4ec6fdbe0e7aa0a407a7731eb53e8007",
+          "git_revision": "6098f1ce2e01f11e325e4ec360031d9192611829",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
+          "notes": [],
           "metrics": []
         }
       ],
