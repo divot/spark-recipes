@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spark Recipe Manager"
+  short_description: "Operate local and upstream Spark recipes"
+  default_prompt: "Use $spark-recipes to list the local recipes and report which model is running."
