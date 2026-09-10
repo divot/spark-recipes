@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-10T19:26:23Z",
+  "updated_at": "2026-09-10T19:26:47Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -49,6 +49,53 @@
       "last_stop_at": null,
       "attempts": [],
       "notes": [],
+      "recipe_changes": []
+    },
+    "local-recipes/qwen3.8-flash-next-a5b-autoround.yaml": {
+      "source": "local",
+      "recipe_path": "local-recipes/qwen3.8-flash-next-a5b-autoround.yaml",
+      "recipe_name": "Qwen3.8-Flash-Next-A5B-AutoRound",
+      "model": "azampatti/Qwen3.8-Flash-Next-125B-A5B-INT4-AutoRound",
+      "present": false,
+      "recipe_sha256": "893d7592d3be3600a6ffa4e41b3c9e3946f83cb0cf3cd8f285c8e6e7dbd0f738",
+      "attempted": true,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": "2026-09-09T08:45:00Z",
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [
+        {
+          "id": "attempt-0001",
+          "recorded_at": "2026-09-10T19:26:47Z",
+          "started_at": "2026-09-09T08:45:00Z",
+          "started_at_is_approximate": true,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "failed",
+          "successful_start": false,
+          "parameters": {},
+          "recipe_sha256": "893d7592d3be3600a6ffa4e41b3c9e3946f83cb0cf3cd8f285c8e6e7dbd0f738",
+          "git_revision": "b48f49c79b1d95f06bb750cfed6d8b00bda53bef",
+          "recipe_dirty": false,
+          "failure_reason": "Excessive swapping prevented the model from starting successfully.",
+          "stop_reason": null,
+          "stop_time_is_observation": false,
+          "notes": [
+            {
+              "recorded_at": "2026-09-10T19:26:47Z",
+              "text": "User reports this recipe has not started successfully. Attempt time is approximate; no end or stop time was provided."
+            }
+          ],
+          "metrics": []
+        }
+      ],
+      "notes": [
+        {
+          "recorded_at": "2026-09-10T19:26:47Z",
+          "text": "Recipe currently exists on Git branch codex/qwen38-a5b-autoround-recipe and is not present on this branch."
+        }
+      ],
       "recipe_changes": []
     },
     "local-recipes/qwen3.8-flash-next-exl3-k4.25.yaml": {
