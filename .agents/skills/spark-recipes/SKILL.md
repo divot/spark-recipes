@@ -22,9 +22,17 @@ is cluster-only, explain that it cannot run on this installation and stop.
   attach shared. Do not replace or quit an existing session.
 - Run `source .venv/bin/activate` after entering the repository in every newly
   created shell/window. Do not assume activation carries across windows.
-- Run each recipe in its own window named exactly
-  `runner-<recipe-name>`, where `<recipe-name>` is the resolved recipe filename
-  without `.yaml`. Management-only commands may run in `control`.
+- Run each launch attempt in a new window named exactly
+  `runner-<source>-<recipe-name>-<attempt-id>`, where `<source>` is `local` or
+  `upstream`, `<recipe-name>` is the resolved recipe filename without `.yaml`,
+  and `<attempt-id>` is the ID returned by `recipe_log.py begin`. Management-only
+  commands may run in `control`.
+- Runner windows are append-only diagnostic records. Start each with an
+  interactive shell and run the recipe launcher as a foreground child; never
+  replace the shell with `exec`. When the launcher returns, show its exit status
+  and completion time and leave the shell open at its prompt so its scrollback
+  remains available. Never reuse, rename, close, or kill a runner window; only
+  the user cleans up retained runner windows.
 - Stay attached while issuing commands or actively monitoring logs. Detach with
   `Ctrl-a d` whenever neither is happening. Detaching must not stop a recipe.
 - Treat the screen session as shared mutable state. The user may change it or
@@ -49,11 +57,12 @@ python .agents/skills/spark-recipes/scripts/inspect_models.py
 ```
 
 The inspector reconciles current local Docker containers, sanitized vLLM
-process metadata, API readiness, matching recipe YAML, and runner windows. Use
-fresh output even if the previous check was recent. If it fails, fall back to
-read-only `docker ps`, sanitized `docker top`, screen window inspection, and
-`/v1/models` requests; never print complete process commands or environment
-variables.
+process metadata, API readiness, matching recipe YAML, and runner windows. Its
+runner-window list can include completed or failed attempts retained for their
+scrollback; a runner window never proves that a model is live. Use fresh output
+even if the previous check was recent. If it fails, fall back to read-only
+`docker ps`, sanitized `docker top`, screen window inspection, and `/v1/models`
+requests; never print complete process commands or environment variables.
 
 When asked what is running, list every detected model separately with recipe
 (when identifiable), container, port, and `ready` or `starting/unreachable`.
@@ -153,15 +162,16 @@ upstream recipes. Reject `cluster_only: true` here.
 
 Use these deterministic identifiers:
 
-- window: `runner-<recipe-name>`
+- attempt window: `runner-<source>-<recipe-name>-<attempt-id>`
 - container: `vllm-<recipe-name>`
 
-If that container or runner window already represents a live launch of the
-same recipe, treat start as an idempotent no-op and report its current state.
-Do not reuse a name owned by a different or stale live process.
-If local and upstream recipes share the same filename stem, their deterministic
-window and container names collide; do not run them concurrently, and require
-the user to identify the source before starting either one.
+If that container represents a live launch of the same recipe, treat start as
+an idempotent no-op and report its current state. Retained runner windows do not
+block a new attempt because their source and attempt ID distinguish them; never
+reuse one. Do not reuse a container name owned by a different or stale live
+process. If local and upstream recipes share the same filename stem, their
+deterministic container names still collide; do not run them concurrently, and
+require the user to identify the source before starting either one.
 
 ## Start a recipe
 
@@ -182,20 +192,29 @@ refreshes, discovery, or stopping other models.
    Review the generated solo command, port, model, image, mods, and material
    overrides. Stop on conflicts or validation errors.
 5. Immediately before the real launch, record the attempt and all non-secret
-   effective overrides, then commit the ledger update:
+   effective overrides, capture the returned attempt ID, then commit the ledger
+   update:
 
    ```bash
    python .agents/skills/spark-recipes/scripts/recipe_log.py begin RECIPE_PATH \
-     --parameters-json '{"port": 8000, "seup": false}'
+     --parameters-json '{"port": 8000, "setup": false}'
    ```
 
-   If no overrides were used, record `{}`. Do not store a raw command line.
-6. Create/select window `runner-RECIPE_NAME`, enter the repository, activate
+   If no overrides were used, record `{}`. Do not store a raw command line. Use
+   the ID printed by this exact `begin` invocation; do not infer it from an old
+   window or an earlier attempt.
+6. Create a brand-new interactive-shell window named
+   `runner-SOURCE-RECIPE_NAME-ATTEMPT_ID`, enter the repository, activate
    `.venv`, and execute the real command there in the foreground:
 
    ```bash
-   exec ./run-recipe.sh RECIPE_PATH --solo --name vllm-RECIPE_NAME
+   ./run-recipe.sh RECIPE_PATH --solo --name vllm-RECIPE_NAME
    ```
+
+   Do not use `exec`. After the command returns for any reason, print a concise
+   marker containing the attempt ID, exit status, and current ISO timestamp,
+   then leave the interactive shell at its prompt. Do not close the window even
+   after a clean stop or an obvious failure.
 
    Pass only overrides explicitly requested or required to resolve an approved
    port conflict. Do not add `--setup` by default.
@@ -204,7 +223,9 @@ refreshes, discovery, or stopping other models.
    final verification. During a long load, provide concise progress updates.
    On readiness run `recipe_log.py ready RECIPE_PATH`; on failure run
    `recipe_log.py fail RECIPE_PATH --reason "..."`. Commit that ledger update.
-8. Detach after active monitoring ends, leaving the recipe and session alive.
+8. Detach after active monitoring ends, leaving the recipe, screen session, and
+   every runner window alive. Finished runner windows remain until the user
+   manually cleans them up.
 
 If launch fails because an image or model artifact is missing, report exactly
 which preparation is required and ask before retrying with `--setup`. Once the
@@ -229,8 +250,10 @@ repository launcher:
 Do not use an unqualified default container name. Do not stop unrelated
 containers, kill the whole screen session, remove containers/images, or clear
 caches. Verify with the live inspector that the selected model is gone and that
-other models remain unchanged. A foreground runner window should exit when its
-container stops; do not destroy shared windows merely for tidiness.
+other models remain unchanged. The foreground launcher should return to its
+runner window's interactive prompt when the container stops. Leave that window
+and its scrollback intact for the user; never send `exit`, `Ctrl-d`, or a Screen
+kill command to it.
 
 After verified shutdown, run `recipe_log.py stop RECIPE_PATH` and commit the
 ledger update. If the user or another process stopped it and the actual time is
