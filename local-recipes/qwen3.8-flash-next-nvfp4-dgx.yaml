@@ -1,0 +1,59 @@
+recipe_version: "1"
+
+name: Qwen3.8-Flash-Next-NVFP4-DGX
+
+description: >
+  Qwen3.8-Flash-Next NVFP4 with the PLE table mmapped from NVMe and the
+  quality-first defaults from blazux/qwen3.8-Flash-DGX on one DGX Spark.
+
+model: RadixArk/Qwen3.8-Flash-Next-NVFP4
+
+solo_only: true
+
+build: qwen38-flash-dgx-bd60fcb
+
+defaults:
+  port: 18300
+  host: 0.0.0.0
+  tensor_parallel: 1
+  gpu_memory_utilization: 0.80
+  max_model_len: 262144
+
+env:
+  HF_HUB_OFFLINE: "1"
+
+  VLLM_PLE_MMAP: "1"
+  VLLM_PLE_MMAP_WORKERS: "32"
+  VLLM_PLE_MMAP_PREWARM: "0"
+  VLLM_PLE_MMAP_MADVISE: "random"
+
+  VLLM_QSA_DET_TOPK: "1"
+  VLLM_QSA_DET_LIB: "/opt/llm/kernel-det/_C_det.so"
+  VLLM_QSA_EXACT_TOPK: "0"
+
+  VLLM_MTP_DRAFT_VOCAB: "/opt/llm/draft_vocab_65536.npy"
+  VLLM_FP8_PAD_M4: "0"
+  VLLM_USE_FLASHINFER_SAMPLER: "1"
+  VLLM_ALLOW_LONG_MAX_MODEL_LEN: "0"
+
+command: |
+  vllm serve RadixArk/Qwen3.8-Flash-Next-NVFP4 \
+    --served-model-name qwen3.8-flash-next \
+    --host {host} \
+    --port {port} \
+    --tensor-parallel-size {tensor_parallel} \
+    --load-format safetensors \
+    --max-model-len {max_model_len} \
+    --max-num-seqs 8 \
+    --gpu-memory-utilization {gpu_memory_utilization} \
+    --enable-prefix-caching \
+    --enable-chunked-prefill \
+    --max-num-batched-tokens 8192 \
+    -cc.cudagraph_mode=PIECEWISE \
+    -cc.splitting_ops='["vllm::unified_attention_with_output","vllm::unified_mla_attention_with_output","vllm::mamba_mixer2","vllm::mamba_mixer","vllm::short_conv","vllm::qwen3_8_flash_next_ple_short_conv","vllm::qwen3_8_flash_next_qsa_with_output","vllm::linear_attention","vllm::qwen_gdn_attention_core","vllm::qwen_gdn_attention_core_fused_norm_packed","vllm::sparse_attn_indexer","vllm::ple_mmap_lookup"]' \
+    --no-enable-flashinfer-autotune \
+    --kv-cache-dtype auto \
+    --enable-auto-tool-choice \
+    --tool-call-parser qwen3_coder \
+    --reasoning-parser qwen3 \
+    --speculative-config '{{"method":"mtp","num_speculative_tokens":2}}'

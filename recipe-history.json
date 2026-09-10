@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-10T23:43:15Z",
+  "updated_at": "2026-09-10T23:54:43Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -159,6 +159,30 @@
       ],
       "notes": [],
       "recipe_changes": []
+    },
+    "local-recipes/qwen3.8-flash-next-nvfp4-dgx.yaml": {
+      "source": "local",
+      "recipe_path": "local-recipes/qwen3.8-flash-next-nvfp4-dgx.yaml",
+      "recipe_name": "Qwen3.8-Flash-Next-NVFP4-DGX",
+      "model": "RadixArk/Qwen3.8-Flash-Next-NVFP4",
+      "present": true,
+      "recipe_sha256": "906f89d4442aa1f258b6e23963957d6ab7828a39e40dc0ce65442bf6b8836aea",
+      "attempted": false,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": null,
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [],
+      "notes": [],
+      "recipe_changes": [
+        {
+          "recorded_at": "2026-09-10T23:54:43Z",
+          "description": "Added a separate local NVFP4 DGX recipe using the pinned blazux/qwen3.8-Flash-DGX image build and the upstream serve.sh defaults.",
+          "previous_recipe_sha256": null,
+          "recipe_sha256": "906f89d4442aa1f258b6e23963957d6ab7828a39e40dc0ce65442bf6b8836aea",
+          "git_revision": "459fc7cd852cfd878de206b17aa566a9cd194f67"
+        }
+      ]
     },
     "recipes/3x-spark-cluster/qwen3.5-397b-int4-autoround.yaml": {
       "source": "upstream",

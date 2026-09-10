@@ -1,0 +1,8 @@
+build_version: "1"
+image: qwen38-flash-dgx:bd60fcb
+method: git
+repository: https://github.com/blazux/qwen3.8-Flash-DGX.git
+ref: bd60fcb1b492ca920f74df7462f05da7b6d98f73
+command: [bash, -c, 'docker build -t "$IMAGE" .']
+env:
+  IMAGE: "{image}"
