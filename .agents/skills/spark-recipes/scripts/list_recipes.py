@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shlex
 from pathlib import Path
 from typing import Any
@@ -12,6 +13,7 @@ import yaml
 
 
 REPO = Path("/home/divot/git/spark-vllm-docker")
+HISTORY = REPO / "recipe-history.json"
 SOURCES = (
     ("local", REPO / "local-recipes"),
     ("upstream", REPO / "recipes"),
@@ -48,7 +50,17 @@ def topology(data: dict[str, Any], path: Path, source: str) -> str:
     return "solo-capable"
 
 
-def list_source(source: str, root: Path) -> None:
+def load_history() -> dict[str, Any]:
+    try:
+        with HISTORY.open() as handle:
+            payload = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return {}
+    recipes = payload.get("recipes", {}) if isinstance(payload, dict) else {}
+    return recipes if isinstance(recipes, dict) else {}
+
+
+def list_source(source: str, root: Path, history: dict[str, Any]) -> None:
     paths = sorted((*root.rglob("*.yaml"), *root.rglob("*.yml")))
     print(f"{source.title()} recipes ({root.relative_to(REPO)}/): {len(paths)}")
     if not paths:
@@ -66,7 +78,13 @@ def list_source(source: str, root: Path) -> None:
             continue
         name = payload.get("name") or path.stem
         model = payload.get("model") or command_model(payload.get("command")) or "unspecified"
-        print(f"- {relative} | {name} | {topology(payload, path, source)}")
+        tracked = history.get(relative.as_posix(), {})
+        attempted = str(bool(tracked.get("attempted"))).lower()
+        successful = str(bool(tracked.get("ever_started_successfully"))).lower()
+        print(
+            f"- {relative} | {name} | {topology(payload, path, source)} "
+            f"| attempted={attempted} | successful={successful}"
+        )
         print(f"  model: {model}")
 
 
@@ -82,6 +100,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    history = load_history()
     selected = SOURCES
     if args.local:
         selected = (SOURCES[0],)
@@ -90,7 +109,7 @@ def main() -> int:
     for index, (source, root) in enumerate(selected):
         if index:
             print()
-        list_source(source, root)
+        list_source(source, root, history)
     return 0
 
 

@@ -1,6 +1,6 @@
 ---
 name: spark-recipes
-description: Operate upstream recipes from recipes/ and custom local recipes from local-recipes/ in /home/divot/git/spark-vllm-docker on this user's single DGX Spark. Use when asked which recipes or models are available, which models are running, or to start or stop a recipe. Keep all operational shell work in the shared GNU screen session named recipes and use the repository .venv. Do not use for repository development.
+description: Operate and track upstream recipes from recipes/ and custom local recipes from local-recipes/ in /home/divot/git/spark-vllm-docker on this user's single DGX Spark. Use when asked which recipes or models are available, which models are running, to start or stop a recipe, or to record/retrieve attempts, timings, launch parameters, performance measurements, recipe changes, or free-form notes. Keep all operational shell work in the shared GNU screen session named recipes and use the repository .venv. Do not use for unrelated repository development.
 ---
 
 # Spark Recipe Manager
@@ -86,6 +86,52 @@ python .agents/skills/spark-recipes/scripts/list_recipes.py --upstream
 An available recipe definition does not prove its image or model artifacts are
 prepared. State that distinction when it matters.
 
+## Recipe history and notes
+
+`recipe-history.json` is the versioned structured ledger. Its format is defined
+by `recipe-history.schema.json`. It tracks every current local and upstream
+recipe, retains removed recipe records, and stores:
+
+- whether launch has ever been attempted or succeeded;
+- per-attempt start, readiness, stop, and end timestamps in UTC;
+- failure and stop reasons, including stop times observed after external action;
+- the recipe hash, Git revision, dirty state, and non-secret launch parameters;
+- free-form recipe/attempt notes and structured tokens-per-second measurements
+  with the exact test query and optional measurement parameters;
+- described recipe revisions with before/after hashes.
+
+Use the helper rather than hand-editing the JSON:
+
+```bash
+LOG=.agents/skills/spark-recipes/scripts/recipe_log.py
+python "$LOG" sync
+python "$LOG" show [RECIPE_PATH]
+python "$LOG" note RECIPE_PATH --text "FREE-FORM NOTE"
+python "$LOG" metric RECIPE_PATH --tokens-per-second N --query "QUERY" \
+  [--parameters-json '{"temperature": 0}'] [--notes "TEXT"]
+python "$LOG" record-failure RECIPE_PATH --reason "REASON" \
+  [--started-at ISO_TIME] [--started-at-approximate] [--ended-at ISO_TIME] \
+  [--git-revision REVISION] [--note "TEXT"]
+python "$LOG" register-git REVISION RECIPE_PATH [--note "TEXT"]
+python "$LOG" change RECIPE_PATH --description "WHAT CHANGED AND WHY"
+```
+
+Resolve `RECIPE_PATH` first and use the explicit path. Notes are intentionally
+free-form strings; preserve the user's meaning without inventing structure or
+facts. If the user supplies no historical timestamp, leave it null instead of
+using the time the note was recorded. Never store credentials, authentication
+headers, secret environment values, or unsanitized raw commands. The helper
+rejects common secret-shaped parameter keys, but still review inputs.
+
+The ledger supplements live inspection; it never overrides Docker/API state.
+When a model described as running is absent, report the mismatch. Mark a stop
+with `--observed` only when the actual stop time is unknown; its `stopped_at`
+then records when the stopped state was observed.
+
+After each logical ledger update, stage only `recipe-history.json` (plus an
+intentionally changed recipe and skill files when applicable) and commit it.
+Preserve unrelated worktree changes.
+
 ## Resolve a recipe
 
 Work from the repository root. Resolve a user name against YAML files below both
@@ -135,7 +181,16 @@ refreshes, discovery, or stopping other models.
 
    Review the generated solo command, port, model, image, mods, and material
    overrides. Stop on conflicts or validation errors.
-5. Create/select window `runner-RECIPE_NAME`, enter the repository, activate
+5. Immediately before the real launch, record the attempt and all non-secret
+   effective overrides, then commit the ledger update:
+
+   ```bash
+   python .agents/skills/spark-recipes/scripts/recipe_log.py begin RECIPE_PATH \
+     --parameters-json '{"port": 8000, "seup": false}'
+   ```
+
+   If no overrides were used, record `{}`. Do not store a raw command line.
+6. Create/select window `runner-RECIPE_NAME`, enter the repository, activate
    `.venv`, and execute the real command there in the foreground:
 
    ```bash
@@ -144,10 +199,12 @@ refreshes, discovery, or stopping other models.
 
    Pass only overrides explicitly requested or required to resolve an approved
    port conflict. Do not add `--setup` by default.
-6. Monitor that runner window and bounded container logs until `/v1/models`
+7. Monitor that runner window and bounded container logs until `/v1/models`
    reports ready or the launch clearly fails. Use the inspector again for the
    final verification. During a long load, provide concise progress updates.
-7. Detach after active monitoring ends, leaving the recipe and session alive.
+   On readiness run `recipe_log.py ready RECIPE_PATH`; on failure run
+   `recipe_log.py fail RECIPE_PATH --reason "..."`. Commit that ledger update.
+8. Detach after active monitoring ends, leaving the recipe and session alive.
 
 If launch fails because an image or model artifact is missing, report exactly
 which preparation is required and ask before retrying with `--setup`. Once the
@@ -174,6 +231,10 @@ containers, kill the whole screen session, remove containers/images, or clear
 caches. Verify with the live inspector that the selected model is gone and that
 other models remain unchanged. A foreground runner window should exit when its
 container stops; do not destroy shared windows merely for tidiness.
+
+After verified shutdown, run `recipe_log.py stop RECIPE_PATH` and commit the
+ledger update. If the user or another process stopped it and the actual time is
+unknown, use `recipe_log.py stop RECIPE_PATH --observed --reason "..."`.
 
 ## Secret and handoff rules
 

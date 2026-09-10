@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "recipe-history.schema.json",
+  "title": "Spark recipe history",
+  "type": "object",
+  "required": ["schema_version", "time_zone", "updated_at", "recipes"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "time_zone": {"const": "UTC"},
+    "updated_at": {"type": ["string", "null"], "format": "date-time"},
+    "recipes": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/recipe"}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "timestamp": {"type": ["string", "null"], "format": "date-time"},
+    "note": {
+      "type": "object",
+      "required": ["recorded_at", "text"],
+      "properties": {
+        "recorded_at": {"type": "string", "format": "date-time"},
+        "text": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "metric": {
+      "type": "object",
+      "required": ["recorded_at", "tokens_per_second", "query", "parameters", "notes"],
+      "properties": {
+        "recorded_at": {"type": "string", "format": "date-time"},
+        "tokens_per_second": {"type": "number", "minimum": 0},
+        "query": {"type": "string"},
+        "parameters": {"type": "object"},
+        "notes": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "attempt": {
+      "type": "object",
+      "required": [
+        "id", "recorded_at", "started_at", "started_at_is_approximate", "ready_at", "stopped_at", "ended_at",
+        "status", "successful_start", "parameters", "recipe_sha256", "git_revision",
+        "recipe_dirty", "failure_reason", "stop_reason", "stop_time_is_observation",
+        "notes", "metrics"
+      ],
+      "properties": {
+        "id": {"type": "string"},
+        "recorded_at": {"type": "string", "format": "date-time"},
+        "started_at": {"$ref": "#/$defs/timestamp"},
+        "started_at_is_approximate": {"type": "boolean"},
+        "ready_at": {"$ref": "#/$defs/timestamp"},
+        "stopped_at": {"$ref": "#/$defs/timestamp"},
+        "ended_at": {"$ref": "#/$defs/timestamp"},
+        "status": {"enum": ["starting", "running", "failed", "stopped", "stopped-externally"]},
+        "successful_start": {"type": "boolean"},
+        "parameters": {"type": "object"},
+        "recipe_sha256": {"type": ["string", "null"]},
+        "git_revision": {"type": ["string", "null"]},
+        "recipe_dirty": {"type": "boolean"},
+        "failure_reason": {"type": ["string", "null"]},
+        "stop_reason": {"type": ["string", "null"]},
+        "stop_time_is_observation": {"type": "boolean"},
+        "notes": {"type": "array", "items": {"$ref": "#/$defs/note"}},
+        "metrics": {"type": "array", "items": {"$ref": "#/$defs/metric"}}
+      },
+      "additionalProperties": false
+    },
+    "change": {
+      "type": "object",
+      "required": ["recorded_at", "description", "previous_recipe_sha256", "recipe_sha256", "git_revision"],
+      "properties": {
+        "recorded_at": {"type": "string", "format": "date-time"},
+        "description": {"type": "string"},
+        "previous_recipe_sha256": {"type": ["string", "null"]},
+        "recipe_sha256": {"type": ["string", "null"]},
+        "git_revision": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "recipe": {
+      "type": "object",
+      "required": [
+        "source", "recipe_path", "recipe_name", "model", "present", "recipe_sha256",
+        "attempted", "ever_started_successfully", "last_attempt_started_at",
+        "last_successful_start_at", "last_stop_at", "attempts", "notes", "recipe_changes"
+      ],
+      "properties": {
+        "source": {"enum": ["local", "upstream"]},
+        "recipe_path": {"type": "string"},
+        "recipe_name": {"type": "string"},
+        "model": {"type": ["string", "null"]},
+        "present": {"type": "boolean"},
+        "recipe_sha256": {"type": "string"},
+        "attempted": {"type": "boolean"},
+        "ever_started_successfully": {"type": "boolean"},
+        "last_attempt_started_at": {"$ref": "#/$defs/timestamp"},
+        "last_successful_start_at": {"$ref": "#/$defs/timestamp"},
+        "last_stop_at": {"$ref": "#/$defs/timestamp"},
+        "attempts": {"type": "array", "items": {"$ref": "#/$defs/attempt"}},
+        "notes": {"type": "array", "items": {"$ref": "#/$defs/note"}},
+        "recipe_changes": {"type": "array", "items": {"$ref": "#/$defs/change"}}
+      },
+      "additionalProperties": false
+    }
+  }
+}

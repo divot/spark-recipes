@@ -33,3 +33,16 @@ container launch is operation.
   authorize real deployments. Perform both only when the user requests both.
 - Do not prune, overwrite, stop, remove, or force-refresh existing resources
   unless the requested task requires it.
+
+## Recipe Provenance and History
+
+- `recipes/` contains upstream recipe definitions. `local-recipes/` contains
+  recipes developed locally; never describe the upstream directory as local.
+- Operational attempts, readiness, stops, measurements, free-form notes, launch
+  parameters, and recipe-change descriptions belong in `recipe-history.json`.
+  Update it with `.agents/skills/spark-recipes/scripts/recipe_log.py`; do not
+  store credentials or secret-bearing raw command lines.
+- When changing a recipe, record a concise change description before another
+  history synchronization can replace the tracked recipe hash.
+- Commit repository and recipe-history changes in focused logical increments,
+  staging only the intended files and preserving unrelated user work.
