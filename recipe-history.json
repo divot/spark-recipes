@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-10T23:54:43Z",
+  "updated_at": "2026-09-10T23:56:20Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -109,7 +109,7 @@
       "ever_started_successfully": true,
       "last_attempt_started_at": "2026-09-10T23:29:10Z",
       "last_successful_start_at": "2026-09-10T23:43:15Z",
-      "last_stop_at": null,
+      "last_stop_at": "2026-09-10T23:56:20Z",
       "attempts": [
         {
           "id": "attempt-0001",
@@ -142,16 +142,16 @@
           "started_at": "2026-09-10T23:29:10Z",
           "started_at_is_approximate": false,
           "ready_at": "2026-09-10T23:43:15Z",
-          "stopped_at": null,
-          "ended_at": null,
-          "status": "running",
+          "stopped_at": "2026-09-10T23:56:20Z",
+          "ended_at": "2026-09-10T23:56:20Z",
+          "status": "stopped",
           "successful_start": true,
           "parameters": {},
           "recipe_sha256": "ba73833b265e9afdb96983aa5df8746d4ec6fdbe0e7aa0a407a7731eb53e8007",
           "git_revision": "6098f1ce2e01f11e325e4ec360031d9192611829",
           "recipe_dirty": false,
           "failure_reason": null,
-          "stop_reason": null,
+          "stop_reason": "Stopped at user request before launching the separate Qwen3.8 Flash NVFP4 DGX recipe.",
           "stop_time_is_observation": false,
           "notes": [],
           "metrics": []
