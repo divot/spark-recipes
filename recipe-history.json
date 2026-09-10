@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-10T23:56:20Z",
+  "updated_at": "2026-09-10T23:56:28Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -167,12 +167,35 @@
       "model": "RadixArk/Qwen3.8-Flash-Next-NVFP4",
       "present": true,
       "recipe_sha256": "906f89d4442aa1f258b6e23963957d6ab7828a39e40dc0ce65442bf6b8836aea",
-      "attempted": false,
+      "attempted": true,
       "ever_started_successfully": false,
-      "last_attempt_started_at": null,
+      "last_attempt_started_at": "2026-09-10T23:56:28Z",
       "last_successful_start_at": null,
       "last_stop_at": null,
-      "attempts": [],
+      "attempts": [
+        {
+          "id": "attempt-0001",
+          "recorded_at": "2026-09-10T23:56:28Z",
+          "started_at": "2026-09-10T23:56:28Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "setup": true
+          },
+          "recipe_sha256": "906f89d4442aa1f258b6e23963957d6ab7828a39e40dc0ce65442bf6b8836aea",
+          "git_revision": "2f0699f5129d00a1953c90ca937500a567d6b398",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
+          "notes": [],
+          "metrics": []
+        }
+      ],
       "notes": [],
       "recipe_changes": [
         {
