@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T07:19:29Z",
+  "updated_at": "2026-09-11T07:26:26Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -170,7 +170,7 @@
       "attempted": true,
       "ever_started_successfully": true,
       "last_attempt_started_at": "2026-09-11T07:19:29Z",
-      "last_successful_start_at": "2026-09-11T06:36:54Z",
+      "last_successful_start_at": "2026-09-11T07:26:26Z",
       "last_stop_at": "2026-09-11T07:19:20Z",
       "attempts": [
         {
@@ -206,11 +206,11 @@
           "recorded_at": "2026-09-11T07:19:29Z",
           "started_at": "2026-09-11T07:19:29Z",
           "started_at_is_approximate": false,
-          "ready_at": null,
+          "ready_at": "2026-09-11T07:26:26Z",
           "stopped_at": null,
           "ended_at": null,
-          "status": "starting",
-          "successful_start": false,
+          "status": "running",
+          "successful_start": true,
           "parameters": {
             "port": 8000,
             "setup": false,
@@ -222,7 +222,12 @@
           "failure_reason": null,
           "stop_reason": null,
           "stop_time_is_observation": false,
-          "notes": [],
+          "notes": [
+            {
+              "recorded_at": "2026-09-11T07:26:26Z",
+              "text": "Ready on port 8000 with native 131,072-token context. Startup reported 20.91 GiB KV cache, 2,405,751 cached-token capacity, and 18.35x theoretical concurrency at full context; max_num_seqs remains 4. A real chat completion with 40,033 prompt tokens returned CONTEXT OK."
+            }
+          ],
           "metrics": []
         }
       ],
