@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T06:16:23Z",
+  "updated_at": "2026-09-11T06:29:31Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -167,12 +167,36 @@
       "model": "inclusionAI/Ling-3.0-flash-VL-int4",
       "present": true,
       "recipe_sha256": "d07a5a196000e9b3204c245c6535666a8ba9f49eca1e4128232bad78fedcfa9a",
-      "attempted": false,
+      "attempted": true,
       "ever_started_successfully": false,
-      "last_attempt_started_at": null,
+      "last_attempt_started_at": "2026-09-11T06:29:31Z",
       "last_successful_start_at": null,
       "last_stop_at": null,
-      "attempts": [],
+      "attempts": [
+        {
+          "id": "attempt-0001",
+          "recorded_at": "2026-09-11T06:29:31Z",
+          "started_at": "2026-09-11T06:29:31Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "port": 8000,
+            "setup": false
+          },
+          "recipe_sha256": "d07a5a196000e9b3204c245c6535666a8ba9f49eca1e4128232bad78fedcfa9a",
+          "git_revision": "7c476a162bb7ad8e67ce84d1fb1b5634ba0b9422",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
+          "notes": [],
+          "metrics": []
+        }
+      ],
       "notes": [],
       "recipe_changes": [
         {
