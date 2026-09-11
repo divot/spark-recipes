@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T04:55:33Z",
+  "updated_at": "2026-09-11T05:48:33Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -187,7 +187,7 @@
       "ever_started_successfully": true,
       "last_attempt_started_at": "2026-09-11T00:17:39Z",
       "last_successful_start_at": "2026-09-11T00:30:23Z",
-      "last_stop_at": "2026-09-11T00:17:26Z",
+      "last_stop_at": "2026-09-11T05:48:33Z",
       "attempts": [
         {
           "id": "attempt-0001",
@@ -217,17 +217,17 @@
           "started_at": "2026-09-11T00:17:39Z",
           "started_at_is_approximate": false,
           "ready_at": "2026-09-11T00:30:23Z",
-          "stopped_at": null,
-          "ended_at": null,
-          "status": "running",
+          "stopped_at": "2026-09-11T05:48:33Z",
+          "ended_at": "2026-09-11T05:48:33Z",
+          "status": "stopped-externally",
           "successful_start": true,
           "parameters": {},
           "recipe_sha256": "c35bbcc935cef76f18c7d958f59ee11f222fe56840025994386ad14c41c25b07",
           "git_revision": "e3decad5c42e7a354dc561118128cca8e4786b05",
           "recipe_dirty": false,
           "failure_reason": null,
-          "stop_reason": null,
-          "stop_time_is_observation": false,
+          "stop_reason": "Container absent during pre-launch inspection before Ling handoff",
+          "stop_time_is_observation": true,
           "notes": [],
           "metrics": []
         }
