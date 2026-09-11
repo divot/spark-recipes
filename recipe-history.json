@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T05:58:18Z",
+  "updated_at": "2026-09-11T06:05:16Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -60,7 +60,7 @@
       "recipe_sha256": "61612f1eb119eccb416251a8a93df8ed2bf3afd08c2b028eb1714a2d68f4ce7f",
       "attempted": true,
       "ever_started_successfully": false,
-      "last_attempt_started_at": "2026-09-11T05:48:56Z",
+      "last_attempt_started_at": "2026-09-11T06:05:16Z",
       "last_successful_start_at": null,
       "last_stop_at": null,
       "attempts": [
@@ -85,6 +85,34 @@
           "stop_reason": null,
           "stop_time_is_observation": false,
           "notes": [],
+          "metrics": []
+        },
+        {
+          "id": "attempt-0002",
+          "recorded_at": "2026-09-11T06:05:16Z",
+          "started_at": "2026-09-11T06:05:16Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "port": 8000,
+            "setup": false
+          },
+          "recipe_sha256": "61612f1eb119eccb416251a8a93df8ed2bf3afd08c2b028eb1714a2d68f4ce7f",
+          "git_revision": "c775835098f555251236282f4805d0b584a86483",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
+          "notes": [
+            {
+              "recorded_at": "2026-09-11T06:05:16Z",
+              "text": "Retry with ARM64 decord2 runtime compatibility package"
+            }
+          ],
           "metrics": []
         }
       ],
