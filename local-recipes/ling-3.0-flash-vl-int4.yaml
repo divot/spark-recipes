@@ -17,7 +17,7 @@ defaults:
   host: 0.0.0.0
   tensor_parallel: 1
   gpu_memory_utilization: 0.80
-  max_model_len: 32768
+  max_model_len: 131072
 
 command: |
   vllm serve inclusionAI/Ling-3.0-flash-VL-int4 \
