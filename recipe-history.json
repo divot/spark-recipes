@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T06:05:16Z",
+  "updated_at": "2026-09-11T06:06:40Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -94,8 +94,8 @@
           "started_at_is_approximate": false,
           "ready_at": null,
           "stopped_at": null,
-          "ended_at": null,
-          "status": "starting",
+          "ended_at": "2026-09-11T06:06:40Z",
+          "status": "failed",
           "successful_start": false,
           "parameters": {
             "port": 8000,
@@ -104,7 +104,7 @@
           "recipe_sha256": "61612f1eb119eccb416251a8a93df8ed2bf3afd08c2b028eb1714a2d68f4ce7f",
           "git_revision": "c775835098f555251236282f4805d0b584a86483",
           "recipe_dirty": false,
-          "failure_reason": null,
+          "failure_reason": "Transformers dynamic module cache omitted bailingmm_utils_video.py relative import",
           "stop_reason": null,
           "stop_time_is_observation": false,
           "notes": [
