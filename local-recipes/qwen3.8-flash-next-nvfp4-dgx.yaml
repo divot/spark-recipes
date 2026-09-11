@@ -13,7 +13,7 @@ solo_only: true
 build: qwen38-flash-dgx-bd60fcb
 
 defaults:
-  port: 18300
+  port: 8000
   host: 0.0.0.0
   tensor_parallel: 1
   gpu_memory_utilization: 0.80

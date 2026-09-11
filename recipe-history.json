@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T00:14:02Z",
+  "updated_at": "2026-09-11T00:16:19Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -166,7 +166,7 @@
       "recipe_name": "Qwen3.8-Flash-Next-NVFP4-DGX",
       "model": "RadixArk/Qwen3.8-Flash-Next-NVFP4",
       "present": true,
-      "recipe_sha256": "906f89d4442aa1f258b6e23963957d6ab7828a39e40dc0ce65442bf6b8836aea",
+      "recipe_sha256": "c35bbcc935cef76f18c7d958f59ee11f222fe56840025994386ad14c41c25b07",
       "attempted": true,
       "ever_started_successfully": true,
       "last_attempt_started_at": "2026-09-10T23:56:28Z",
@@ -204,6 +204,13 @@
           "previous_recipe_sha256": null,
           "recipe_sha256": "906f89d4442aa1f258b6e23963957d6ab7828a39e40dc0ce65442bf6b8836aea",
           "git_revision": "459fc7cd852cfd878de206b17aa566a9cd194f67"
+        },
+        {
+          "recorded_at": "2026-09-11T00:16:19Z",
+          "description": "Changed the local recipe default API port from 18300 to 8000 at the user's request.",
+          "previous_recipe_sha256": "906f89d4442aa1f258b6e23963957d6ab7828a39e40dc0ce65442bf6b8836aea",
+          "recipe_sha256": "c35bbcc935cef76f18c7d958f59ee11f222fe56840025994386ad14c41c25b07",
+          "git_revision": "2628b371193b2ab316c55688271b1e00abfd0dd2"
         }
       ]
     },
