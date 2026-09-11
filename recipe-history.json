@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T00:17:39Z",
+  "updated_at": "2026-09-11T00:30:23Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -170,7 +170,7 @@
       "attempted": true,
       "ever_started_successfully": true,
       "last_attempt_started_at": "2026-09-11T00:17:39Z",
-      "last_successful_start_at": "2026-09-11T00:14:02Z",
+      "last_successful_start_at": "2026-09-11T00:30:23Z",
       "last_stop_at": "2026-09-11T00:17:26Z",
       "attempts": [
         {
@@ -200,11 +200,11 @@
           "recorded_at": "2026-09-11T00:17:39Z",
           "started_at": "2026-09-11T00:17:39Z",
           "started_at_is_approximate": false,
-          "ready_at": null,
+          "ready_at": "2026-09-11T00:30:23Z",
           "stopped_at": null,
           "ended_at": null,
-          "status": "starting",
-          "successful_start": false,
+          "status": "running",
+          "successful_start": true,
           "parameters": {},
           "recipe_sha256": "c35bbcc935cef76f18c7d958f59ee11f222fe56840025994386ad14c41c25b07",
           "git_revision": "e3decad5c42e7a354dc561118128cca8e4786b05",
