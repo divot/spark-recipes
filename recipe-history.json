@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T06:15:22Z",
+  "updated_at": "2026-09-11T06:16:23Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -56,7 +56,7 @@
       "recipe_path": "local-recipes/ling-3.0-flash-vl-fp4.yaml",
       "recipe_name": "Ling-3.0-Flash-VL-FP4",
       "model": "inclusionAI/Ling-3.0-flash-VL-fp4",
-      "present": true,
+      "present": false,
       "recipe_sha256": "61612f1eb119eccb416251a8a93df8ed2bf3afd08c2b028eb1714a2d68f4ce7f",
       "attempted": true,
       "ever_started_successfully": false,
@@ -157,6 +157,30 @@
           "previous_recipe_sha256": "61612f1eb119eccb416251a8a93df8ed2bf3afd08c2b028eb1714a2d68f4ce7f",
           "recipe_sha256": "61612f1eb119eccb416251a8a93df8ed2bf3afd08c2b028eb1714a2d68f4ce7f",
           "git_revision": "6221c6af0ab852d9cd74353a1f5c81549873ad6f"
+        }
+      ]
+    },
+    "local-recipes/ling-3.0-flash-vl-int4.yaml": {
+      "source": "local",
+      "recipe_path": "local-recipes/ling-3.0-flash-vl-int4.yaml",
+      "recipe_name": "Ling-3.0-Flash-VL-INT4",
+      "model": "inclusionAI/Ling-3.0-flash-VL-int4",
+      "present": true,
+      "recipe_sha256": "d07a5a196000e9b3204c245c6535666a8ba9f49eca1e4128232bad78fedcfa9a",
+      "attempted": false,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": null,
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [],
+      "notes": [],
+      "recipe_changes": [
+        {
+          "recorded_at": "2026-09-11T06:16:16Z",
+          "description": "Added single-Spark INT4 compressed-tensors recipe after FP4 DeepGEMM load-time OOM",
+          "previous_recipe_sha256": null,
+          "recipe_sha256": "d07a5a196000e9b3204c245c6535666a8ba9f49eca1e4128232bad78fedcfa9a",
+          "git_revision": "49f5ee2564cb80c2994d853b91e4e9c4c11b529d"
         }
       ]
     },
