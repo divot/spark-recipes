@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T06:08:48Z",
+  "updated_at": "2026-09-11T06:15:22Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -122,8 +122,8 @@
           "started_at_is_approximate": false,
           "ready_at": null,
           "stopped_at": null,
-          "ended_at": null,
-          "status": "starting",
+          "ended_at": "2026-09-11T06:15:09Z",
+          "status": "failed",
           "successful_start": false,
           "parameters": {
             "port": 8000,
@@ -132,7 +132,7 @@
           "recipe_sha256": "61612f1eb119eccb416251a8a93df8ed2bf3afd08c2b028eb1714a2d68f4ce7f",
           "git_revision": "419e5e444c0b9b644479e9b0e950f98a23e57243",
           "recipe_dirty": false,
-          "failure_reason": null,
+          "failure_reason": "FP4 DeepGEMM E8M0 runtime exhausted 128 GB device address space while loading weights",
           "stop_reason": null,
           "stop_time_is_observation": false,
           "notes": [
@@ -144,7 +144,12 @@
           "metrics": []
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "recorded_at": "2026-09-11T06:15:22Z",
+          "text": "Not suitable for one 128 GB DGX Spark with the official vLLM DeepGEMM path; pivoted to INT4 compressed-tensors after measured load-time OOM"
+        }
+      ],
       "recipe_changes": [
         {
           "recorded_at": "2026-09-11T05:58:13Z",
