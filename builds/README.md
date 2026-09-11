@@ -74,6 +74,9 @@ This delegates to `build-and-copy.sh`, preserving the existing project-specific
 vLLM build path. Recipes that declare `container` and optional `build_args`
 continue to use that legacy path without a build definition.
 
+Use repeatable `--extra-python-package <spec>` arguments when a model fork needs
+additional runtime-only Python packages in the resulting image.
+
 `run-recipe.py <recipe> --setup` prepares a missing image. Add `--force-build`
 to rebuild it even when its tag already exists. A dry run with those flags
 prints the selected build and command without cloning or building.

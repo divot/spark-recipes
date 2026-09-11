@@ -1121,6 +1121,21 @@ test_custom_torch_versions_are_forwarded() {
     pass "Torch versions and the B12X source checkout are forwarded to the fork build"
 }
 
+test_extra_python_packages_are_forwarded() {
+    setup_fixture
+    run_build \
+        --rebuild-vllm \
+        --extra-python-package decord2==3.4.0 \
+        --extra-python-package example-runtime==1.2.3 \
+        || fail "extra Python package run failed"
+    assert_log_contains '^docker build -t vllm-node .*--build-arg EXTRA_PYTHON_PACKAGES=decord2==3.4.0 example-runtime==1.2.3 '
+    if ! grep -Fq 'ARG EXTRA_PYTHON_PACKAGES=""' "$PROJECT_DIR/Dockerfile" ||
+       ! grep -Fq 'instanttensor $EXTRA_PYTHON_PACKAGES' "$PROJECT_DIR/Dockerfile"; then
+        fail "Dockerfile does not install requested extra Python packages"
+    fi
+    pass "extra runtime Python packages are forwarded to the runner image"
+}
+
 test_local_inference_lab_b12x_applies_to_any_ref() {
     setup_fixture
     run_build \
@@ -1449,6 +1464,7 @@ test_spark_kv_cache_cleanup_patch_supports_b12x_final_snapshot
 test_mrv2_speculator_cudagraph_pool_patch_is_guarded_and_idempotent
 test_dockerfile_preserves_selected_blackwell_target
 test_custom_torch_versions_are_forwarded
+test_extra_python_packages_are_forwarded
 test_local_inference_lab_b12x_applies_to_any_ref
 test_local_inference_lab_b12x_requires_torch_212
 test_dockerfile_custom_repo_bypasses_shared_cache

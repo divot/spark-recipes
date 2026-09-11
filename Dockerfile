@@ -786,6 +786,7 @@ ENV PATH=$VLLM_BASE_DIR:$PATH
 # Final extra deps
 # Pin torch and CUTLASS DSL via --override so transitive dependencies cannot
 # trigger an upgrade/downgrade or swap CUDA-built torch for PyPI's CPU wheel.
+ARG EXTRA_PYTHON_PACKAGES=""
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
     PINNED_TORCH=$(python3 -c "import torch; print(torch.__version__)") && \
     PINNED_TORCHVISION=$(python3 -c "import importlib.metadata as m; print(m.version('torchvision'))") && \
@@ -795,7 +796,7 @@ RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv \
     if [ -n "$PINNED_TORCHAUDIO" ]; then echo "torchaudio==${PINNED_TORCHAUDIO}" >> /tmp/torch-override.txt; fi && \
     echo "nvidia-cutlass-dsl[cu13]==${CUTLASS_DSL_VERSION}" >> /tmp/torch-override.txt && \
     echo "fastapi[standard]>=0.115.0,<0.137.0" >> /tmp/torch-override.txt && \
-    uv pip install ray[default] fastsafetensors instanttensor \
+    uv pip install ray[default] fastsafetensors instanttensor $EXTRA_PYTHON_PACKAGES \
         --override /tmp/torch-override.txt
 
 # Upstream vLLM and the local-inference-lab fork consume the external B12X

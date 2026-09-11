@@ -67,6 +67,7 @@ TORCHVISION_VERSION_SET=false
 TORCHAUDIO_VERSION="2.11.0"
 TORCHAUDIO_VERSION_SET=false
 CUTLASS_DSL_VERSION="4.7.0"
+EXTRA_PYTHON_PACKAGES=()
 NETWORK_ARG=""
 WHEELS_REPO="eugr/spark-vllm-docker"
 FLASHINFER_RELEASE_TAG="prebuilt-flashinfer-current"
@@ -143,6 +144,7 @@ build_args:
   exp_mxfp4: ${exp_mxfp4}
   vllm_prs: "${vllm_prs}"
   build_jobs: ${BUILD_JOBS}
+  extra_python_packages: "${EXTRA_PYTHON_PACKAGES[*]}"
 EOF
     echo "Generated build-metadata.yaml"
 }
@@ -598,6 +600,7 @@ promote_wheel_set() {
 # Help function
 usage() {
     echo "Usage: $0 [OPTIONS]"
+    echo "  --extra-python-package <spec> : Add a runtime Python package (repeatable)"
     echo "  -t, --tag <tag>               : Local image tag (default: 'vllm-node'; preset tags: 'vllm-node-tf5', 'vllm-node-mxfp4', or 'vllm-node-b12x')"
     echo "  --use-wheels                  : Build only the runner from precompiled wheels; never implicitly build source."
     echo "  --gpu-arch <arch>             : GPU architecture for NCCL, wheel, and source builds (default: '${DEFAULT_GPU_ARCH_LIST}')"
@@ -713,6 +716,15 @@ while [[ "$#" -gt 0 ]]; do
                 shift
             else
                 echo "Error: --torchaudio-version requires a version."
+                exit 1
+            fi
+            ;;
+        --extra-python-package)
+            if [ -n "${2:-}" ] && [[ "$2" != -* ]]; then
+                EXTRA_PYTHON_PACKAGES+=("$2")
+                shift
+            else
+                echo "Error: --extra-python-package requires a package spec."
                 exit 1
             fi
             ;;
@@ -1347,6 +1359,10 @@ if [ "$NO_BUILD" = false ]; then
             RUNNER_CMD+=("--build-arg" "B12X_REPO=$B12X_REPO")
             RUNNER_CMD+=("--build-arg" "B12X_REF=$B12X_REF")
             RUNNER_CMD+=("--build-arg" "B12X_CACHEBUST=$B12X_CACHEBUST")
+        fi
+
+        if [ "${#EXTRA_PYTHON_PACKAGES[@]}" -gt 0 ]; then
+            RUNNER_CMD+=("--build-arg" "EXTRA_PYTHON_PACKAGES=${EXTRA_PYTHON_PACKAGES[*]}")
         fi
 
         RUNNER_CMD+=(".")

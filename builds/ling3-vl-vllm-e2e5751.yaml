@@ -6,3 +6,5 @@ args:
   - https://github.com/inclusionAI/vllm-ling-v3.git
   - --vllm-ref
   - e2e5751a5d01f4755a07c026f1acd8480ca6ceae
+  - --extra-python-package
+  - decord2==3.4.0
