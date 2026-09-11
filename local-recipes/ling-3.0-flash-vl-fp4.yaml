@@ -1,0 +1,38 @@
+recipe_version: "1"
+
+name: Ling-3.0-Flash-VL-FP4
+
+description: >
+  inclusionAI Ling 3.0 Flash VL FP4 on one DGX Spark, using the official
+  vLLM fork and its Blackwell DeepGEMM MXFP4 expert path.
+
+model: inclusionAI/Ling-3.0-flash-VL-fp4
+
+solo_only: true
+
+build: ling3-vl-vllm-e2e5751
+
+defaults:
+  port: 8000
+  host: 0.0.0.0
+  tensor_parallel: 1
+  gpu_memory_utilization: 0.80
+  max_model_len: 32768
+
+command: |
+  vllm serve inclusionAI/Ling-3.0-flash-VL-fp4 \
+    --served-model-name ling-3.0-flash-vl \
+    --host {host} \
+    --port {port} \
+    --tensor-parallel-size {tensor_parallel} \
+    --gpu-memory-utilization {gpu_memory_utilization} \
+    --max-model-len {max_model_len} \
+    --max-num-seqs 4 \
+    --max-num-batched-tokens 8192 \
+    --trust-remote-code \
+    --enable-prefix-caching \
+    --mamba-cache-mode align \
+    --moe-backend deep_gemm \
+    --enable-auto-tool-choice \
+    --tool-call-parser ling3 \
+    --reasoning-parser ling3

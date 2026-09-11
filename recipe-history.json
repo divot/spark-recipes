@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-11T00:30:23Z",
+  "updated_at": "2026-09-11T04:55:33Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -42,6 +42,22 @@
       "model": "unsloth/GLM-5.3-Flash-GGUF:UD-Q2_K_XL",
       "present": true,
       "recipe_sha256": "88b1b72e4a7ddab8fbd1262b26de51fd356ea698b3991231b21321b2c94c01fd",
+      "attempted": false,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": null,
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [],
+      "notes": [],
+      "recipe_changes": []
+    },
+    "local-recipes/ling-3.0-flash-vl-fp4.yaml": {
+      "source": "local",
+      "recipe_path": "local-recipes/ling-3.0-flash-vl-fp4.yaml",
+      "recipe_name": "Ling-3.0-Flash-VL-FP4",
+      "model": "inclusionAI/Ling-3.0-flash-VL-fp4",
+      "present": true,
+      "recipe_sha256": "61612f1eb119eccb416251a8a93df8ed2bf3afd08c2b028eb1714a2d68f4ce7f",
       "attempted": false,
       "ever_started_successfully": false,
       "last_attempt_started_at": null,
