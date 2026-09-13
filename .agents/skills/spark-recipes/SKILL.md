@@ -20,6 +20,17 @@ is cluster-only, explain that it cannot run on this installation and stop.
 - Attach with `screen -x recipes`, not `screen -r`, so the user can attach at
   the same time. If it does not exist, create it with a `control` window, then
   attach shared. Do not replace or quit an existing session.
+- Treat Screen state observed inside a sandbox or PID namespace as
+  inconclusive. A live host session can appear as `(Dead ???)`, its encoded
+  master PID can be absent from sandboxed `ps`, and a sandboxed `screen -x`
+  can fail even while the user can attach normally. These signals do not prove
+  that a session or endpoint is stale.
+- If normal attachment fails or Screen listings conflict, retry the exact
+  `screen -x SESSION` attachment with approved host/out-of-sandbox execution.
+  Until a host attachment proves the session is absent, never run `screen
+  -wipe`, `screen -S ... -X quit`, unlink Screen endpoints, or create a
+  replacement session. If host attachment is unavailable, stop and ask the
+  user to identify or restore the intended session.
 - Run `source .venv/bin/activate` after entering the repository in every newly
   created shell/window. Do not assume activation carries across windows.
 - Run each launch attempt in a new window named exactly
