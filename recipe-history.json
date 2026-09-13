@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-13T06:36:08Z",
+  "updated_at": "2026-09-13T06:38:18Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -50,6 +50,30 @@
       "attempts": [],
       "notes": [],
       "recipe_changes": []
+    },
+    "local-recipes/gpt-oss-120b-mxfp4.yaml": {
+      "source": "local",
+      "recipe_path": "local-recipes/gpt-oss-120b-mxfp4.yaml",
+      "recipe_name": "OpenAI GPT-OSS 120B MXFP4 (Local)",
+      "model": "openai/gpt-oss-120b",
+      "present": true,
+      "recipe_sha256": "9bc6ac72c1bfb4c3c12744f8c63e93abc5c43eabf5c73d9477452c4f41b47a59",
+      "attempted": false,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": null,
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [],
+      "notes": [],
+      "recipe_changes": [
+        {
+          "recorded_at": "2026-09-13T06:38:18Z",
+          "description": "Added a local single-DGX Spark GPT-OSS 120B recipe mirroring the optimized upstream CUTLASS MXFP4 and FlashInfer configuration on port 8000.",
+          "previous_recipe_sha256": null,
+          "recipe_sha256": "9bc6ac72c1bfb4c3c12744f8c63e93abc5c43eabf5c73d9477452c4f41b47a59",
+          "git_revision": "4535f8a1156991024a9079eccae66516e066744c"
+        }
+      ]
     },
     "local-recipes/ling-3.0-flash-vl-fp4.yaml": {
       "source": "local",
