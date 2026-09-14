@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-14T04:59:22Z",
+  "updated_at": "2026-09-14T04:59:34Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -870,12 +870,36 @@
       "model": "openai/gpt-oss-120b",
       "present": true,
       "recipe_sha256": "85d1146cf26895046709dace65308da0a93d3d5f5216e454fa29180743f887a0",
-      "attempted": false,
+      "attempted": true,
       "ever_started_successfully": false,
-      "last_attempt_started_at": null,
+      "last_attempt_started_at": "2026-09-14T04:59:34Z",
       "last_successful_start_at": null,
       "last_stop_at": null,
-      "attempts": [],
+      "attempts": [
+        {
+          "id": "attempt-0001",
+          "recorded_at": "2026-09-14T04:59:34Z",
+          "started_at": "2026-09-14T04:59:34Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "port": 8000,
+            "setup": false
+          },
+          "recipe_sha256": "85d1146cf26895046709dace65308da0a93d3d5f5216e454fa29180743f887a0",
+          "git_revision": "bcb2e61bdadfd1a8639a323ba932a2042cad7b00",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
+          "notes": [],
+          "metrics": []
+        }
+      ],
       "notes": [],
       "recipe_changes": []
     },
