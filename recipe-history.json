@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-14T04:55:55Z",
+  "updated_at": "2026-09-14T04:59:22Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -839,7 +839,12 @@
       "last_successful_start_at": null,
       "last_stop_at": null,
       "attempts": [],
-      "notes": [],
+      "notes": [
+        {
+          "recorded_at": "2026-09-14T04:59:22Z",
+          "text": "Stopped the externally started ready vllm_node instance occupying port 8000 before the requested GPT-OSS launch; it had no tracked active attempt."
+        }
+      ],
       "recipe_changes": []
     },
     "recipes/nemotron-3.5-lightning.yaml": {
