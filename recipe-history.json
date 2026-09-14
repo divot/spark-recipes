@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-14T05:42:54Z",
+  "updated_at": "2026-09-14T05:49:07Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -602,6 +602,22 @@
       "notes": [],
       "recipe_changes": []
     },
+    "recipes/deepseek-v4-flash-vision-exp.yaml": {
+      "source": "upstream",
+      "recipe_path": "recipes/deepseek-v4-flash-vision-exp.yaml",
+      "recipe_name": "DeepSeek-V4-Flash-Vision-Exp",
+      "model": "deepseek-ai/DeepSeek-V4-Flash-Vision-Exp",
+      "present": true,
+      "recipe_sha256": "44b6195ee729faaca5ba34bb164bed20d5c0f8a3834429267c065c9897d04d99",
+      "attempted": false,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": null,
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [],
+      "notes": [],
+      "recipe_changes": []
+    },
     "recipes/deepseek-v4-flash.yaml": {
       "source": "upstream",
       "recipe_path": "recipes/deepseek-v4-flash.yaml",
@@ -1072,9 +1088,49 @@
       "source": "upstream",
       "recipe_path": "recipes/qwen3.8-27b-nvfp4-dflash2.yaml",
       "recipe_name": "Qwen3.8-27B-NVFP4-DFlash2",
-      "model": "RadixArk/Qwen3.8-27B-NVFP4",
+      "model": "nvidia/Qwen3.8-27B-NVFP4",
       "present": true,
-      "recipe_sha256": "dfdc6afc1a8781550bee2da03ff6189d59b9e6c78b833b3761428b9aa0511daf",
+      "recipe_sha256": "f7512b7fd6930c8bf1982a2e9855129f5e277167869313195fa95675b9fdb8c0",
+      "attempted": false,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": null,
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [],
+      "notes": [],
+      "recipe_changes": [
+        {
+          "recorded_at": "2026-09-14T05:49:07Z",
+          "description": "Recipe content changed; no description was supplied before synchronization.",
+          "previous_recipe_sha256": "dfdc6afc1a8781550bee2da03ff6189d59b9e6c78b833b3761428b9aa0511daf",
+          "recipe_sha256": "f7512b7fd6930c8bf1982a2e9855129f5e277167869313195fa95675b9fdb8c0",
+          "git_revision": "537472ec814e83c109b222fb66571eea834ac53a"
+        }
+      ]
+    },
+    "recipes/qwen3.8-flash-next-nvfp4-cluster.yaml": {
+      "source": "upstream",
+      "recipe_path": "recipes/qwen3.8-flash-next-nvfp4-cluster.yaml",
+      "recipe_name": "Qwen3.8-Flash-Next-NVFP4 (Cluster)",
+      "model": "local-inference-lab/Qwen3.8-Flash-Next-NVFP4",
+      "present": true,
+      "recipe_sha256": "1b3689a8b8e61d820ec75a2bb0656b92e5b9ee9f6587fa46c58f18d67e4a962e",
+      "attempted": false,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": null,
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [],
+      "notes": [],
+      "recipe_changes": []
+    },
+    "recipes/qwen3.8-flash-next-nvfp4-solo.yaml": {
+      "source": "upstream",
+      "recipe_path": "recipes/qwen3.8-flash-next-nvfp4-solo.yaml",
+      "recipe_name": "Qwen3.8-Flash-Next-NVFP4 (Solo)",
+      "model": "local-inference-lab/Qwen3.8-Flash-Next-NVFP4",
+      "present": true,
+      "recipe_sha256": "532a8e5724b1732ebaa0665088df0f095d09729ee2ec24cd95db91451aa904ba",
       "attempted": false,
       "ever_started_successfully": false,
       "last_attempt_started_at": null,
