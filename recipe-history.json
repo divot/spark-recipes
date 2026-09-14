@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-14T04:55:32Z",
+  "updated_at": "2026-09-14T04:55:55Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -56,7 +56,7 @@
       "recipe_path": "local-recipes/gpt-oss-120b-mxfp4.yaml",
       "recipe_name": "OpenAI GPT-OSS 120B MXFP4 (Local)",
       "model": "openai/gpt-oss-120b",
-      "present": true,
+      "present": false,
       "recipe_sha256": "9bc6ac72c1bfb4c3c12744f8c63e93abc5c43eabf5c73d9477452c4f41b47a59",
       "attempted": true,
       "ever_started_successfully": true,
@@ -93,7 +93,12 @@
           "metrics": []
         }
       ],
-      "notes": [],
+      "notes": [
+        {
+          "recorded_at": "2026-09-14T04:55:45Z",
+          "text": "Retired this redundant local definition after verifying it matched the upstream recipes/openai-gpt-oss-120b.yaml configuration; future launches should use the upstream recipe."
+        }
+      ],
       "recipe_changes": [
         {
           "recorded_at": "2026-09-13T06:38:18Z",
