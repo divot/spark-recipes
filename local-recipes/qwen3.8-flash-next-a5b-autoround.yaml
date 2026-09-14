@@ -1,0 +1,106 @@
+# Qwen3.8-Flash-Next 125B-A5B INT4 AutoRound on ONE DGX Spark.
+#
+# This uses azampatti's healed top-5 derivative and the Spark-specific
+# Saren-Arterius AutoRound/vLLM image stack. The model routes 5 experts per
+# token; the MTP draft is generated at container startup with top-k restored
+# to 10, matching the configuration used for the higher-acceptance benchmark
+# results without duplicating model weights.
+#
+# SETUP
+# -----
+#   ./run-recipe.sh local-recipes/qwen3.8-flash-next-a5b-autoround.yaml \
+#     --solo --setup
+#
+# RUN
+# ---
+#   ./run-recipe.sh local-recipes/qwen3.8-flash-next-a5b-autoround.yaml \
+#     --solo
+#
+# Lighter smoke test:
+#   ./run-recipe.sh local-recipes/qwen3.8-flash-next-a5b-autoround.yaml \
+#     --solo --max-model-len 32768
+#
+# Notes:
+#   * 20 GiB explicit KV cache is intentional on GB10; gpu_memory_utilization
+#     is kept tiny so vLLM does not try to infer a cache size from unified RAM.
+#   * Prefix caching is enabled; this fp8-hybrid path was specifically reported
+#     stable with it.
+#   * KV dtype defaults to auto for best speed/quality. fp8_e4m3 fits more
+#     context but costs performance and some quality.
+#   * The PLE table is mmapped from the model's ple-table directory.
+#   * MTP=3 is the measured sweet spot for this derivative.
+
+recipe_version: "1"
+name: Qwen3.8-Flash-Next-A5B-AutoRound
+
+description: >-
+  Single-DGX-Spark Qwen3.8-Flash-Next healed top-5 A5B derivative,
+  AutoRound INT4 routed experts, fp8 hybrid side layers, SSD-backed PLE,
+  explicit KV sizing, prefix caching, and top-k-10 MTP draft at depth 3.
+
+model: azampatti/Qwen3.8-Flash-Next-125B-A5B-INT4-AutoRound
+
+solo_only: true
+
+build: qwen38-flash-next-a5b-autoround-20260908
+
+defaults:
+  host: 0.0.0.0
+  port: 8000
+  max_model_len: 262144
+  max_num_seqs: 8
+  max_num_batched_tokens: 8192
+  gpu_memory_utilization: 0.01
+  kv_cache_memory_bytes: 20g
+  kv_cache_dtype: auto
+  mtp: 3
+
+env:
+  OMP_NUM_THREADS: "8"
+  CUDA_CACHE_PATH: "/root/.cache/cuda"
+  TRITON_CACHE_DIR: "/root/.cache/triton"
+
+  VLLM_PLE_MMAP: "1"
+  VLLM_PLE_MMAP_WORKERS: "32"
+  VLLM_PLE_MMAP_PREWARM: "1"
+
+  VLLM_MARLIN_USE_ATOMIC_ADD: "1"
+  VLLM_FP8_HYBRID: "1"
+  VLLM_USE_DEEP_GEMM: "0"
+  VLLM_USE_FLASHINFER_SAMPLER: "1"
+
+command: |
+  set -euo pipefail
+  MODEL_ROOT=/root/.cache/huggingface/hub/models--azampatti--Qwen3.8-Flash-Next-125B-A5B-INT4-AutoRound
+  REV=$(cat "$MODEL_ROOT/refs/main")
+  MODEL_DIR="$MODEL_ROOT/snapshots/$REV"
+  TABLE_DIR="$MODEL_DIR/ple-table"
+  DRAFT_DIR=/tmp/qwen38-flash-next-a5b-draft-k10
+
+  test -f "$MODEL_DIR/config.json"
+  test -d "$TABLE_DIR"
+
+  python3 -c 'import json,os,shutil,sys; src,dst=sys.argv[1:3]; shutil.rmtree(dst,ignore_errors=True); os.makedirs(dst); [os.symlink(os.path.join(src,n),os.path.join(dst,n)) for n in os.listdir(src) if n != "config.json"]; cfg=json.load(open(os.path.join(src,"config.json"))); cfg.get("text_config",cfg)["num_experts_per_tok"]=10; json.dump(cfg,open(os.path.join(dst,"config.json"),"w"),indent=2)' "$MODEL_DIR" "$DRAFT_DIR"
+
+  export VLLM_PLE_MMAP_DIR="$TABLE_DIR"
+
+  exec vllm serve "$MODEL_DIR" \
+    --served-model-name qwen3.8-flash-next-a5b \
+    --host {host} \
+    --port {port} \
+    --load-format fastsafetensors \
+    --max-model-len {max_model_len} \
+    --max-num-seqs {max_num_seqs} \
+    --max-num-batched-tokens {max_num_batched_tokens} \
+    --gpu-memory-utilization {gpu_memory_utilization} \
+    --kv-cache-memory-bytes {kv_cache_memory_bytes} \
+    --kv-cache-dtype {kv_cache_dtype} \
+    --enable-prefix-caching \
+    --enable-chunked-prefill \
+    -cc.cudagraph_mode=PIECEWISE \
+    -cc.splitting_ops='["vllm::unified_attention_with_output","vllm::unified_mla_attention_with_output","vllm::mamba_mixer2","vllm::mamba_mixer","vllm::short_conv","vllm::qwen3_8_flash_next_ple_short_conv","vllm::qwen3_8_flash_next_qsa_with_output","vllm::linear_attention","vllm::qwen_gdn_attention_core","vllm::qwen_gdn_attention_core_fused_norm_packed","vllm::sparse_attn_indexer","vllm::ple_mmap_lookup"]' \
+    --no-enable-flashinfer-autotune \
+    --enable-auto-tool-choice \
+    --tool-call-parser qwen3_coder \
+    --reasoning-parser qwen3 \
+    --speculative-config '{{"method":"mtp","num_speculative_tokens":{mtp},"model":"'$DRAFT_DIR'"}}'
