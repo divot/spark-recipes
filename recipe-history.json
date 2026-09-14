@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-14T05:02:58Z",
+  "updated_at": "2026-09-14T05:03:45Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -896,7 +896,12 @@
           "failure_reason": null,
           "stop_reason": null,
           "stop_time_is_observation": false,
-          "notes": [],
+          "notes": [
+            {
+              "recorded_at": "2026-09-14T05:03:45Z",
+              "text": "Verified /v1/models returned the upstream openai/gpt-oss-120b model and a live /v1/chat/completions request returned exactly SPARK_OK with finish_reason stop."
+            }
+          ],
           "metrics": []
         }
       ],
