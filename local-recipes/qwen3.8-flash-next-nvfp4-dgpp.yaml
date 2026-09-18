@@ -31,7 +31,7 @@ command: |
     --ngram-table mmap \
     --dense-weights fp8 \
     --max-concurrency 4 \
-    --default-max-tokens 256 \
+    --default-max-tokens 32768 \
     --queue-limit 8 \
     --max-connections 64 \
     --decode-graph \
