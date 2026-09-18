@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-18T05:36:40Z",
+  "updated_at": "2026-09-18T07:54:24Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -422,7 +422,7 @@
       "recipe_name": "Qwen3.8-Flash-Next-NVFP4-DGPP",
       "model": "nvidia/Qwen3.8-Flash-Next-NVFP4",
       "present": true,
-      "recipe_sha256": "bebf3df2b8d4b1d6da64980f56dfc7c73df2a6eac8983c239c9a8129216c52f8",
+      "recipe_sha256": "1689c356b83a6a76c38cb7ebd1795ab3f8a6bdf8839a098503e7eb438a3cd6b8",
       "attempted": true,
       "ever_started_successfully": true,
       "last_attempt_started_at": "2026-09-18T05:34:55Z",
@@ -484,6 +484,13 @@
           "previous_recipe_sha256": "4df2239958de8990e2b49b7c22d87b984017bf7dd768a1fc0fb1664fa57b6084",
           "recipe_sha256": "bebf3df2b8d4b1d6da64980f56dfc7c73df2a6eac8983c239c9a8129216c52f8",
           "git_revision": "0b512478bf36c12118d0e02004294530f3cb4120"
+        },
+        {
+          "recorded_at": "2026-09-18T07:54:24Z",
+          "description": "Raise the DGPP KV token pool from 65536 to 262144 at user request",
+          "previous_recipe_sha256": "bebf3df2b8d4b1d6da64980f56dfc7c73df2a6eac8983c239c9a8129216c52f8",
+          "recipe_sha256": "1689c356b83a6a76c38cb7ebd1795ab3f8a6bdf8839a098503e7eb438a3cd6b8",
+          "git_revision": "a51c3782a5756c5bca52d86a3a99f8bc7146043f"
         }
       ]
     },
