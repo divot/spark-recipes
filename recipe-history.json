@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-18T05:33:40Z",
+  "updated_at": "2026-09-18T05:34:27Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -427,7 +427,7 @@
       "ever_started_successfully": true,
       "last_attempt_started_at": "2026-09-18T05:17:26Z",
       "last_successful_start_at": "2026-09-18T05:20:38Z",
-      "last_stop_at": null,
+      "last_stop_at": "2026-09-18T05:34:27Z",
       "attempts": [
         {
           "id": "attempt-0001",
@@ -435,9 +435,9 @@
           "started_at": "2026-09-18T05:17:26Z",
           "started_at_is_approximate": false,
           "ready_at": "2026-09-18T05:20:38Z",
-          "stopped_at": null,
-          "ended_at": null,
-          "status": "running",
+          "stopped_at": "2026-09-18T05:34:27Z",
+          "ended_at": "2026-09-18T05:34:27Z",
+          "status": "stopped",
           "successful_start": true,
           "parameters": {
             "port": 8000,
@@ -447,7 +447,7 @@
           "git_revision": "bced83f405f1954def41945d3add98a836106b77",
           "recipe_dirty": false,
           "failure_reason": null,
-          "stop_reason": null,
+          "stop_reason": "Restarting with a 32768-token server default",
           "stop_time_is_observation": false,
           "notes": [],
           "metrics": []
