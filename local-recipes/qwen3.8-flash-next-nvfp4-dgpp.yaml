@@ -1,0 +1,44 @@
+recipe_version: "1"
+
+name: Qwen3.8-Flash-Next-NVFP4-DGPP
+
+description: >-
+  Single-DGX-Spark Qwen3.8-Flash-Next NVFP4 served by DGPP with its published
+  GB10 configuration: FP8 dense weights, mapped n-gram table, decode graphs,
+  and one-token MTP drafting.
+
+model: nvidia/Qwen3.8-Flash-Next-NVFP4
+
+solo_only: true
+
+build: dgpp-qwen38-a5fcb18
+
+defaults:
+  host: 0.0.0.0
+  port: 8000
+
+env:
+  HF_HUB_OFFLINE: "1"
+  DGPP_RESIDENT_CACHE_DIR: /root/.cache/huggingface/dgpp-resident
+
+command: |
+  dgpp-serve \
+    --model nvidia/Qwen3.8-Flash-Next-NVFP4 \
+    --bind-host {host} \
+    --port {port} \
+    --kv-capacity 65536 \
+    --kv-dtype bf16 \
+    --ngram-table mmap \
+    --dense-weights fp8 \
+    --max-concurrency 4 \
+    --default-max-tokens 256 \
+    --queue-limit 8 \
+    --max-connections 64 \
+    --decode-graph \
+    --mtp \
+    --mtp-depth 1 \
+    --sampling-candidates 128 \
+    --prefix-cache-gib 1.5 \
+    --admission full \
+    --admission-window 256 \
+    --stats-interval-s 10
