@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-18T04:52:28Z",
+  "updated_at": "2026-09-18T05:17:26Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -423,12 +423,36 @@
       "model": "nvidia/Qwen3.8-Flash-Next-NVFP4",
       "present": true,
       "recipe_sha256": "4df2239958de8990e2b49b7c22d87b984017bf7dd768a1fc0fb1664fa57b6084",
-      "attempted": false,
+      "attempted": true,
       "ever_started_successfully": false,
-      "last_attempt_started_at": null,
+      "last_attempt_started_at": "2026-09-18T05:17:26Z",
       "last_successful_start_at": null,
       "last_stop_at": null,
-      "attempts": [],
+      "attempts": [
+        {
+          "id": "attempt-0001",
+          "recorded_at": "2026-09-18T05:17:26Z",
+          "started_at": "2026-09-18T05:17:26Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "port": 8000,
+            "setup": false
+          },
+          "recipe_sha256": "4df2239958de8990e2b49b7c22d87b984017bf7dd768a1fc0fb1664fa57b6084",
+          "git_revision": "bced83f405f1954def41945d3add98a836106b77",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
+          "notes": [],
+          "metrics": []
+        }
+      ],
       "notes": [],
       "recipe_changes": []
     },
