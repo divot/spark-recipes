@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-19T02:26:15Z",
+  "updated_at": "2026-09-19T04:11:27Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -425,7 +425,7 @@
       "recipe_sha256": "1689c356b83a6a76c38cb7ebd1795ab3f8a6bdf8839a098503e7eb438a3cd6b8",
       "attempted": true,
       "ever_started_successfully": true,
-      "last_attempt_started_at": "2026-09-18T07:55:11Z",
+      "last_attempt_started_at": "2026-09-19T04:11:27Z",
       "last_successful_start_at": "2026-09-18T07:57:04Z",
       "last_stop_at": "2026-09-18T20:15:45Z",
       "attempts": [
@@ -494,6 +494,29 @@
           "recipe_dirty": false,
           "failure_reason": null,
           "stop_reason": "Shutdown requested before host reboot",
+          "stop_time_is_observation": false,
+          "notes": [],
+          "metrics": []
+        },
+        {
+          "id": "attempt-0004",
+          "recorded_at": "2026-09-19T04:11:27Z",
+          "started_at": "2026-09-19T04:11:27Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "port": 8000,
+            "setup": false
+          },
+          "recipe_sha256": "1689c356b83a6a76c38cb7ebd1795ab3f8a6bdf8839a098503e7eb438a3cd6b8",
+          "git_revision": "fb7da285db3e1bc6f4ba52747316be822b4af0f2",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
           "stop_time_is_observation": false,
           "notes": [],
           "metrics": []
