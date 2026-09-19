@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-19T02:18:58Z",
+  "updated_at": "2026-09-19T02:20:13Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -598,12 +598,36 @@
       "model": "prism-ml/Ternary-Bonsai-2-27B-gguf:PTQ1_0",
       "present": true,
       "recipe_sha256": "7dec68c99cfaf8cd94eae14f528eb7c6adbe799caf564add702cfdfbe552553a",
-      "attempted": false,
+      "attempted": true,
       "ever_started_successfully": false,
-      "last_attempt_started_at": null,
+      "last_attempt_started_at": "2026-09-19T02:20:13Z",
       "last_successful_start_at": null,
       "last_stop_at": null,
-      "attempts": [],
+      "attempts": [
+        {
+          "id": "attempt-0001",
+          "recorded_at": "2026-09-19T02:20:13Z",
+          "started_at": "2026-09-19T02:20:13Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "port": 8000,
+            "setup": true
+          },
+          "recipe_sha256": "7dec68c99cfaf8cd94eae14f528eb7c6adbe799caf564add702cfdfbe552553a",
+          "git_revision": "a22d4084c9e4c1236a2ccb4c9fb45e41cc03dff7",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
+          "notes": [],
+          "metrics": []
+        }
+      ],
       "notes": [],
       "recipe_changes": [
         {
