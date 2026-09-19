@@ -45,4 +45,3 @@ RUN CUDACXX=/usr/local/cuda/bin/nvcc \
 
 # run-recipe/launch-cluster supplies the actual command.
 CMD ["bash"]
-
