@@ -1,0 +1,6 @@
+build_version: "1"
+image: prism-bonsai2-llamacpp:cuda13.0-b10709
+method: dockerfile
+context: builds/prism-bonsai2-llamacpp
+dockerfile: Dockerfile
+

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-18T20:15:45Z",
+  "updated_at": "2026-09-19T02:18:58Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -588,6 +588,30 @@
           "previous_recipe_sha256": "906f89d4442aa1f258b6e23963957d6ab7828a39e40dc0ce65442bf6b8836aea",
           "recipe_sha256": "c35bbcc935cef76f18c7d958f59ee11f222fe56840025994386ad14c41c25b07",
           "git_revision": "2628b371193b2ab316c55688271b1e00abfd0dd2"
+        }
+      ]
+    },
+    "local-recipes/ternary-bonsai-2-27b-ptq1-0.yaml": {
+      "source": "local",
+      "recipe_path": "local-recipes/ternary-bonsai-2-27b-ptq1-0.yaml",
+      "recipe_name": "Ternary-Bonsai-2-27B-PTQ1_0",
+      "model": "prism-ml/Ternary-Bonsai-2-27B-gguf:PTQ1_0",
+      "present": true,
+      "recipe_sha256": "7dec68c99cfaf8cd94eae14f528eb7c6adbe799caf564add702cfdfbe552553a",
+      "attempted": false,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": null,
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [],
+      "notes": [],
+      "recipe_changes": [
+        {
+          "recorded_at": "2026-09-19T02:18:58Z",
+          "description": "Added a single-DGX-Spark PTQ1_0 recipe using a pinned PrismML llama.cpp CUDA 13 build, selective Hugging Face download, vision projector, 131K context, and one server slot.",
+          "previous_recipe_sha256": "7dec68c99cfaf8cd94eae14f528eb7c6adbe799caf564add702cfdfbe552553a",
+          "recipe_sha256": "7dec68c99cfaf8cd94eae14f528eb7c6adbe799caf564add702cfdfbe552553a",
+          "git_revision": "6e76d613bd6a8f25bc811871d0104e01dbe33c8d"
         }
       ]
     },

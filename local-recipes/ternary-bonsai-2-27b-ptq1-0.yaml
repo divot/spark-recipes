@@ -1,0 +1,59 @@
+# PrismML Ternary Bonsai 2 27B PTQ1_0 on ONE DGX Spark.
+#
+# SETUP + RUN
+# -----------
+#   ./run-recipe.sh \
+#     local-recipes/ternary-bonsai-2-27b-ptq1-0.yaml \
+#     --solo --setup
+#
+# This uses PrismML's pinned llama.cpp fork. Stock llama.cpp cannot run Bonsai
+# 2 because the model needs its Hadamard activation transform and PTQ1_0 CUDA
+# kernels.
+#
+# The model field is intentionally omitted: llama-server's -hf selector fetches
+# only the 5.9 GB PTQ1_0 model and automatically fetches the Q8 vision projector,
+# rather than downloading every quant in the Hugging Face repository. HF_HOME
+# points at the persistent cache already mounted by launch-cluster.sh.
+#
+# The single slot and 131K context make this a useful baseline for single-user
+# decode measurements. The model supports up to 262144 tokens; override with:
+#
+#   ./run-recipe.sh \
+#     local-recipes/ternary-bonsai-2-27b-ptq1-0.yaml \
+#     --solo --max-model-len 262144
+
+recipe_version: "1"
+name: Ternary-Bonsai-2-27B-PTQ1_0
+description: >-
+  Single-DGX-Spark PrismML Ternary Bonsai 2 27B using the dense 1.75-bit
+  PTQ1_0 GGUF, PrismML's pinned llama.cpp fork, and vision projector.
+
+build: prism-bonsai2-llamacpp-cuda13.0-b10709
+solo_only: true
+
+env:
+  HF_HOME: /root/.cache/huggingface
+
+defaults:
+  host: 0.0.0.0
+  port: 8000
+  max_model_len: 131072
+  parallel: 1
+  cache_ram_mib: 256
+
+command: |
+  llama-server \
+    -hf prism-ml/Ternary-Bonsai-2-27B-gguf:PTQ1_0 \
+    --host {host} \
+    --port {port} \
+    --n-gpu-layers 999 \
+    --ctx-size {max_model_len} \
+    --parallel {parallel} \
+    --cache-type-k f16 \
+    --cache-type-v f16 \
+    --flash-attn on \
+    --cache-ram {cache_ram_mib} \
+    --temp 1.0 \
+    --top-p 0.95 \
+    --top-k 20 \
+    --jinja
