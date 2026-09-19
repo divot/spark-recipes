@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-19T02:20:13Z",
+  "updated_at": "2026-09-19T02:26:15Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -599,9 +599,9 @@
       "present": true,
       "recipe_sha256": "7dec68c99cfaf8cd94eae14f528eb7c6adbe799caf564add702cfdfbe552553a",
       "attempted": true,
-      "ever_started_successfully": false,
+      "ever_started_successfully": true,
       "last_attempt_started_at": "2026-09-19T02:20:13Z",
-      "last_successful_start_at": null,
+      "last_successful_start_at": "2026-09-19T02:26:15Z",
       "last_stop_at": null,
       "attempts": [
         {
@@ -609,11 +609,11 @@
           "recorded_at": "2026-09-19T02:20:13Z",
           "started_at": "2026-09-19T02:20:13Z",
           "started_at_is_approximate": false,
-          "ready_at": null,
+          "ready_at": "2026-09-19T02:26:15Z",
           "stopped_at": null,
           "ended_at": null,
-          "status": "starting",
-          "successful_start": false,
+          "status": "running",
+          "successful_start": true,
           "parameters": {
             "port": 8000,
             "setup": true
