@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-10-02T03:50:05Z",
+  "updated_at": "2026-10-02T03:53:00Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -316,7 +316,7 @@
       "recipe_sha256": "9db1baa9077bd04cf9cacac4b4ab9c89c7d5d2c6ffc9335cc14064e75ead7c96",
       "attempted": true,
       "ever_started_successfully": true,
-      "last_attempt_started_at": "2026-10-02T00:56:49Z",
+      "last_attempt_started_at": "2026-10-02T03:53:00Z",
       "last_successful_start_at": "2026-10-02T01:06:33Z",
       "last_stop_at": "2026-10-02T03:50:05Z",
       "attempts": [
@@ -340,6 +340,30 @@
           "failure_reason": null,
           "stop_reason": "Observed absent after Screen master termination; Docker events show launcher cleanup stopped and auto-removed the container at 2026-10-02T03:03:29Z.",
           "stop_time_is_observation": true,
+          "notes": [],
+          "metrics": []
+        },
+        {
+          "id": "attempt-0002",
+          "recorded_at": "2026-10-02T03:53:00Z",
+          "started_at": "2026-10-02T03:53:00Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "port": 8000,
+            "setup": false,
+            "daemon": true
+          },
+          "recipe_sha256": "9db1baa9077bd04cf9cacac4b4ab9c89c7d5d2c6ffc9335cc14064e75ead7c96",
+          "git_revision": "1120cb02deae7be4391f2b64fe6ce44a576e98e6",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
           "notes": [],
           "metrics": []
         }
