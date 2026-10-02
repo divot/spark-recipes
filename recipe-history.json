@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-10-02T00:53:03Z",
+  "updated_at": "2026-10-02T00:56:49Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -314,12 +314,36 @@
       "model": "ornith-ai/Ornith-1.5-35B-A3B-NVFP4",
       "present": true,
       "recipe_sha256": "9db1baa9077bd04cf9cacac4b4ab9c89c7d5d2c6ffc9335cc14064e75ead7c96",
-      "attempted": false,
+      "attempted": true,
       "ever_started_successfully": false,
-      "last_attempt_started_at": null,
+      "last_attempt_started_at": "2026-10-02T00:56:49Z",
       "last_successful_start_at": null,
       "last_stop_at": null,
-      "attempts": [],
+      "attempts": [
+        {
+          "id": "attempt-0001",
+          "recorded_at": "2026-10-02T00:56:49Z",
+          "started_at": "2026-10-02T00:56:49Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "port": 8000,
+            "setup": true
+          },
+          "recipe_sha256": "9db1baa9077bd04cf9cacac4b4ab9c89c7d5d2c6ffc9335cc14064e75ead7c96",
+          "git_revision": "c1bf2f153b96250914be0f62e0b7a12a44b3b64a",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
+          "notes": [],
+          "metrics": []
+        }
+      ],
       "notes": [],
       "recipe_changes": []
     },
