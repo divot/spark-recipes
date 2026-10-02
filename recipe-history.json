@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-09-19T04:13:48Z",
+  "updated_at": "2026-10-02T00:53:03Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -306,6 +306,22 @@
           "git_revision": "f5265a0c907d66a908baedb163d6bd5b84aaa603"
         }
       ]
+    },
+    "local-recipes/ornith-1.5-35b-a3b-nvfp4.yaml": {
+      "source": "local",
+      "recipe_path": "local-recipes/ornith-1.5-35b-a3b-nvfp4.yaml",
+      "recipe_name": "Ornith-1.5-35B-A3B-NVFP4 (Solo)",
+      "model": "ornith-ai/Ornith-1.5-35B-A3B-NVFP4",
+      "present": true,
+      "recipe_sha256": "9db1baa9077bd04cf9cacac4b4ab9c89c7d5d2c6ffc9335cc14064e75ead7c96",
+      "attempted": false,
+      "ever_started_successfully": false,
+      "last_attempt_started_at": null,
+      "last_successful_start_at": null,
+      "last_stop_at": null,
+      "attempts": [],
+      "notes": [],
+      "recipe_changes": []
     },
     "local-recipes/qwen3.8-flash-next-a5b-autoround.yaml": {
       "source": "local",
