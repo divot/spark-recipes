@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-10-02T01:06:33Z",
+  "updated_at": "2026-10-02T03:50:05Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -318,7 +318,7 @@
       "ever_started_successfully": true,
       "last_attempt_started_at": "2026-10-02T00:56:49Z",
       "last_successful_start_at": "2026-10-02T01:06:33Z",
-      "last_stop_at": null,
+      "last_stop_at": "2026-10-02T03:50:05Z",
       "attempts": [
         {
           "id": "attempt-0001",
@@ -326,9 +326,9 @@
           "started_at": "2026-10-02T00:56:49Z",
           "started_at_is_approximate": false,
           "ready_at": "2026-10-02T01:06:33Z",
-          "stopped_at": null,
-          "ended_at": null,
-          "status": "running",
+          "stopped_at": "2026-10-02T03:50:05Z",
+          "ended_at": "2026-10-02T03:50:05Z",
+          "status": "stopped-externally",
           "successful_start": true,
           "parameters": {
             "port": 8000,
@@ -338,8 +338,8 @@
           "git_revision": "c1bf2f153b96250914be0f62e0b7a12a44b3b64a",
           "recipe_dirty": false,
           "failure_reason": null,
-          "stop_reason": null,
-          "stop_time_is_observation": false,
+          "stop_reason": "Observed absent after Screen master termination; Docker events show launcher cleanup stopped and auto-removed the container at 2026-10-02T03:03:29Z.",
+          "stop_time_is_observation": true,
           "notes": [],
           "metrics": []
         }
