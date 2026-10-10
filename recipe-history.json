@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-10-10T06:30:47Z",
+  "updated_at": "2026-10-10T06:30:53Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -489,7 +489,7 @@
       "recipe_sha256": "dd71ccdeb22f341e467ae10f523721db1b156a19c7681107dc9fe254871744cb",
       "attempted": true,
       "ever_started_successfully": true,
-      "last_attempt_started_at": "2026-09-19T04:11:27Z",
+      "last_attempt_started_at": "2026-10-10T06:30:53Z",
       "last_successful_start_at": "2026-09-19T04:13:48Z",
       "last_stop_at": "2026-10-10T06:30:47Z",
       "attempts": [
@@ -582,6 +582,29 @@
           "failure_reason": null,
           "stop_reason": "No live model container or API endpoint was present before the 2026-10-09 setup launch",
           "stop_time_is_observation": true,
+          "notes": [],
+          "metrics": []
+        },
+        {
+          "id": "attempt-0005",
+          "recorded_at": "2026-10-10T06:30:53Z",
+          "started_at": "2026-10-10T06:30:53Z",
+          "started_at_is_approximate": false,
+          "ready_at": null,
+          "stopped_at": null,
+          "ended_at": null,
+          "status": "starting",
+          "successful_start": false,
+          "parameters": {
+            "port": 8000,
+            "setup": true
+          },
+          "recipe_sha256": "dd71ccdeb22f341e467ae10f523721db1b156a19c7681107dc9fe254871744cb",
+          "git_revision": "65a5e9c6b56c916801fa2bff6f4efe29eb5f50c8",
+          "recipe_dirty": false,
+          "failure_reason": null,
+          "stop_reason": null,
+          "stop_time_is_observation": false,
           "notes": [],
           "metrics": []
         }
