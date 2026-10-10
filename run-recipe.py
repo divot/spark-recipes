@@ -94,6 +94,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from cluster_topology import Topology, validate_launch
+
 try:
     import yaml
 except ImportError:
@@ -612,11 +614,10 @@ def copy_existing_image(image: str, copy_to: list[str]) -> bool:
         str(BUILD_SCRIPT),
         "-t",
         image,
-        "--no-build",
-        "--copy-to",
-        ",".join(copy_to),
-        "--copy-parallel",
     ]
+    if ENV_FILE and ENV_FILE.exists():
+        cmd.extend(["--config", str(ENV_FILE)])
+    cmd.extend(["--no-build", "--copy-to", ",".join(copy_to), "--copy-parallel"])
     print(f"Copying image '{image}' to: {', '.join(copy_to)}")
     return subprocess.run(cmd).returncode == 0
 
@@ -626,8 +627,16 @@ def build_image(
     copy_to: list[str] | None = None,
     build_args: list[str] | None = None,
     build_definition: dict[str, Any] | None = None,
+    *,
+    copy_only: bool = False,
 ) -> bool:
     """Prepare an image with a named build or the legacy vLLM builder."""
+    if copy_only:
+        if not copy_to:
+            print("Error: Copy-only image preparation requires at least one target")
+            return False
+        return copy_existing_image(image, copy_to)
+
     if build_definition is not None:
         method = build_definition["method"]
         if image != build_definition["image"]:
@@ -685,6 +694,8 @@ def build_image(
         return False
 
     cmd = [str(BUILD_SCRIPT), "-t", image]
+    if ENV_FILE and ENV_FILE.exists():
+        cmd.extend(["--config", str(ENV_FILE)])
     if build_args:
         cmd.extend(build_args)
     if copy_to:
@@ -725,6 +736,8 @@ def download_model(model: str, copy_to: list[str] | None = None) -> bool:
         return False
 
     cmd = [str(DOWNLOAD_SCRIPT), model]
+    if ENV_FILE and ENV_FILE.exists():
+        cmd.extend(["--config", str(ENV_FILE)])
     if copy_to:
         cmd.extend(["--copy-to", ",".join(copy_to), "--copy-parallel"])
 
@@ -1235,7 +1248,7 @@ Examples:
         "--no-cache-dirs",
         action="store_true",
         dest="no_cache_dirs",
-        help="Do not mount ~/.cache/vllm, ~/.cache/flashinfer, ~/.triton",
+        help="Do not mount ~/.cache/vllm, ~/.cache/flashinfer, ~/.cache/b12x, ~/.triton, ~/.tilelang",
     )
     launch_group.add_argument(
         "--keep-entrypoint",
@@ -1247,7 +1260,7 @@ Examples:
         "--earlyoom",
         action="store_true",
         dest="earlyoom",
-        help="Run earlyoom as the container foreground process instead of sleep infinity",
+        help="Run earlyoom as the container foreground process (install it with apt-get if missing)",
     )
     launch_group.add_argument(
         "--earlyoom-args",
@@ -1526,6 +1539,26 @@ Examples:
             print(f"Runtime vLLM PRs: {', '.join(cli_vllm_prs)}")
         print()
 
+    ring_env = {}
+    if is_cluster and env.get("CLUSTER_LINKS"):
+        try:
+            topology = Topology.from_env(env)
+            if not (args.build_only or args.download_only):
+                # Validate the effective launch before setup mutates image/model state.
+                topology_overrides = {key: getattr(args, key) for key in (
+                    "port", "host", "tensor_parallel", "gpu_memory_utilization", "max_model_len"
+                ) if getattr(args, key) is not None}
+                topology_script = generate_launch_script(
+                    recipe, topology_overrides, is_solo=False, extra_args=extra_args, use_ray=use_ray)
+                nccl_env = {key.removeprefix("CONTAINER_"): value for key, value in env.items()
+                            if key.startswith("CONTAINER_")}
+                nccl_env.update(dict(item.split("=", 1) for item in args.env_vars if "=" in item))
+                nccl_env.update(recipe.get("env", {}))
+                ring_env = validate_launch(topology, nodes, topology_script, use_ray, nccl_env)
+        except ValueError as exc:
+            print(f"Error: {exc}")
+            return 1
+
     # --- Build Phase ---
     if args.build_only or args.setup or args.force_build:
         if args.dry_run:
@@ -1555,22 +1588,28 @@ Examples:
                 print()
             else:
                 print(f"Container '{container}' already exists locally.")
-                # Check worker nodes in cluster mode
-                if copy_targets:
-                    missing_on = []
-                    for worker in copy_targets:
-                        if not check_image_exists(container, worker):
-                            missing_on.append(worker)
-                    if missing_on:
-                        print(f"Container missing on workers: {', '.join(missing_on)}")
-                        print("Copying prepared image...")
-                        if build_definition is not None:
-                            copied = copy_existing_image(container, missing_on)
-                        else:
-                            copied = build_image(container, missing_on, build_args)
-                        if not copied:
-                            print("Error: Failed to build/copy container")
-                            return 1
+                if copy_targets and env.get("CLUSTER_LINKS"):
+                    # Compare exact image IDs using the saved copy paths.
+                    if not build_image(container, copy_targets, copy_only=True):
+                        print("Error: Failed to synchronize container image")
+                        return 1
+                else:
+                    # Check worker nodes in cluster mode
+                    if copy_targets:
+                        missing_on = []
+                        for worker in copy_targets:
+                            if not check_image_exists(container, worker):
+                                missing_on.append(worker)
+                        if missing_on:
+                            print(f"Container missing on workers: {', '.join(missing_on)}")
+                            print("Copying prepared image...")
+                            if build_definition is not None:
+                                copied = copy_existing_image(container, missing_on)
+                            else:
+                                copied = build_image(container, missing_on, build_args)
+                            if not copied:
+                                print("Error: Failed to build/copy container")
+                                return 1
                 print()
 
         if args.build_only:
@@ -1581,7 +1620,7 @@ Examples:
     if model and (args.download_only or args.setup or args.force_download):
         if args.dry_run:
             model_exists = check_model_exists(model)
-            if args.force_download or not model_exists:
+            if args.force_download or not model_exists or (copy_targets and env.get("CLUSTER_LINKS")):
                 print(f"Would download model: {model}")
                 if copy_targets:
                     print(f"  Would copy to: {', '.join(copy_targets)}")
@@ -1591,7 +1630,7 @@ Examples:
         else:
             model_exists = check_model_exists(model)
 
-            if args.force_download or not model_exists:
+            if args.force_download or not model_exists or (copy_targets and env.get("CLUSTER_LINKS")):
                 print("=== Downloading Model ===")
                 if not download_model(model, copy_targets):
                     print("Error: Failed to download model")
@@ -1684,6 +1723,11 @@ Examples:
         extra_args=extra_args,
         use_ray=use_ray,
     )
+
+    if ring_env:
+        script_content = script_content.replace(
+            "#!/bin/bash\n", "#!/bin/bash\n" + "".join(
+                f"export {key}={value}\n" for key, value in ring_env.items()), 1)
 
     if args.dry_run:
         print("=== Generated Launch Script ===")
