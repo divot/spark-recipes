@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "time_zone": "UTC",
-  "updated_at": "2026-10-02T03:59:30Z",
+  "updated_at": "2026-10-10T06:08:41Z",
   "recipes": {
     "local-recipes/glm-5.3-flash-ud-iq3-xxs.yaml": {
       "source": "local",
@@ -486,7 +486,7 @@
       "recipe_name": "Qwen3.8-Flash-Next-NVFP4-DGPP",
       "model": "nvidia/Qwen3.8-Flash-Next-NVFP4",
       "present": true,
-      "recipe_sha256": "1689c356b83a6a76c38cb7ebd1795ab3f8a6bdf8839a098503e7eb438a3cd6b8",
+      "recipe_sha256": "dd71ccdeb22f341e467ae10f523721db1b156a19c7681107dc9fe254871744cb",
       "attempted": true,
       "ever_started_successfully": true,
       "last_attempt_started_at": "2026-09-19T04:11:27Z",
@@ -601,6 +601,13 @@
           "previous_recipe_sha256": "bebf3df2b8d4b1d6da64980f56dfc7c73df2a6eac8983c239c9a8129216c52f8",
           "recipe_sha256": "1689c356b83a6a76c38cb7ebd1795ab3f8a6bdf8839a098503e7eb438a3cd6b8",
           "git_revision": "a51c3782a5756c5bca52d86a3a99f8bc7146043f"
+        },
+        {
+          "recorded_at": "2026-10-10T06:08:41Z",
+          "description": "Update DGPP to 41e3216 and align the single-Spark NVIDIA NVFP4 settings with the current upstream template: BF12 companion weights, FP8 MMA head, 4K prefill budgets, and a 3 GiB prefix cache",
+          "previous_recipe_sha256": "1689c356b83a6a76c38cb7ebd1795ab3f8a6bdf8839a098503e7eb438a3cd6b8",
+          "recipe_sha256": "dd71ccdeb22f341e467ae10f523721db1b156a19c7681107dc9fe254871744cb",
+          "git_revision": "ec736faf0f68548185b87b5d066cc8a3b574158c"
         }
       ]
     },

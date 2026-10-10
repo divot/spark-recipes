@@ -1,7 +1,7 @@
 build_version: "1"
-image: dgpp-qwen38:a5fcb18
+image: dgpp-qwen38:41e3216
 method: dockerfile
 context: builds/dgpp-qwen38
 dockerfile: Dockerfile
 args:
-  DGPP_REF: a5fcb189c28f4193276818ef51bf423a9bb6d914
+  DGPP_REF: 41e3216d845edddcbc1703ab83fab09877052b33
